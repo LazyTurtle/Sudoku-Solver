@@ -4,4 +4,4 @@ This Godot application uses constraint programming (constrant satisfability prob
 
 For now it has abysmal performance, but it does work!
 
-I'll focus on improving performance in the next updates.
+I'll focus on improving performances in the next updates.
