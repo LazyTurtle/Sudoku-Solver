@@ -12,35 +12,41 @@ namespace SudokuSolver.CSP_Solver.Strategies
         public override InferenceResults infer(ConstrainSatisfactionProblem csp, Variable variable, object value)
         {
             InferenceResults results = new InferenceResults();
-            /*results.storeDomainForVariable(variable, variable.getDomain());
-            variable.setDomain(new Domain(new object[] { value }));*/
 
-            
-            Queue<Constraint> constraints_queue = new Queue<Constraint>(csp.getConstraints());
-            while (constraints_queue.Count > 0)
+            Queue<Tuple<Variable, Variable>> arcs = CreateListOfArcs<BinaryNotEquals>(csp);
+            while (arcs.Count > 0)
             {
-                Constraint constraint = constraints_queue.Dequeue();
-                // TODO: AC3 only uses binary constraints, not only binarynotequals
-                if (constraint is BinaryNotEquals)
+                Tuple<Variable, Variable> arc = arcs.Dequeue();
+                
+                Variable X = arc.Item1, Y = arc.Item2;
+                if (revise(csp, X, Y, results))
                 {
-                    Variable X = constraint.ElementAt(0), Y = constraint.ElementAt(1);
-                    if (revise(csp, X, Y, results))
+                    if (X.getDomain().getValues().Count() == 0)
                     {
-                        if (X.getDomain().getValues().Count() == 0)
-                        {
-                            results.inconsistencyFound();
-                            return results;
-                        }
-                        foreach(Variable neighbour in csp.neighboursOf(X))
-                        {
-                            if(neighbour != Y)
-                            constraints_queue.Enqueue(new BinaryNotEquals(neighbour, X));
-                        }
+                        results.inconsistencyFound();
+                        return results;
+                    }
+                    foreach (Variable neighbour in csp.neighboursOf(X))
+                    {
+                        if (neighbour != Y)
+                            arcs.Enqueue(new Tuple<Variable, Variable>(neighbour,X));
                     }
                 }
             }
 
             return results;
+        }
+
+        private Queue<Tuple<Variable, Variable>> CreateListOfArcs<Tconstraint>(ConstrainSatisfactionProblem csp)
+        {
+            Queue<Tuple<Variable, Variable>> arcs = new Queue<Tuple<Variable, Variable>>();
+            foreach (Constraint c in csp.getConstraints())
+            {
+                // TODO: AC3 only uses binary constraints, not only binarynotequals
+                if (c is Tconstraint)
+                    arcs.Enqueue(new Tuple<Variable, Variable>(c.ElementAt(0), c.ElementAt(1)));
+            }
+            return arcs;
         }
 
         private bool revise(ConstrainSatisfactionProblem csp, Variable variableX, Variable variableY, InferenceResults results)
@@ -53,12 +59,15 @@ namespace SudokuSolver.CSP_Solver.Strategies
             {
                 assignment.assign(variableX, valueX);
                 bool satisfiable = false;
-                // TODO: optimize, could exit the cycle before checking them all
-                foreach (object valueY in variableY.getDomain().getValues())
+                
+                foreach(object valueY in variableY.getDomain().getValues())
                 {
                     assignment.assign(variableY, valueY);
                     if (assignment.IsConsistent(csp.getConstraints()))
+                    {
                         satisfiable = true;
+                        break;
+                    }
                 }
                 if (!satisfiable)
                 {
