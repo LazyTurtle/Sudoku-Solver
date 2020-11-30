@@ -63,4 +63,26 @@ namespace SudokuSolver.CSP_Solver.Solver
             return null;
         }
     }
+
+    public class BacktrackSolver<Tval> : Solver<Tval>
+    {
+        private InferenceStrategy<Tval> inferenceStrategy;
+        private VariableSelectionStrategy<Tval> variableSelectionStrategy;
+        private DomainValueSelectionStragety<Tval> domainValueSelectionStragety;
+
+
+        public BacktrackSolver(InferenceStrategy<Tval> infs = null, VariableSelectionStrategy<Tval> vss = null, DomainValueSelectionStragety<Tval> dvss = null)
+        {
+            inferenceStrategy = infs ?? new AC3<Tval>();
+            variableSelectionStrategy = vss ?? new MinimumRemainingValues<Tval>();
+            domainValueSelectionStragety = dvss ?? new UnorderedDomainValues<Tval>();
+
+        }
+
+        public override Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null)
+        {
+            OnNoSolutionFound();
+            return null;
+        }
+    }
 }

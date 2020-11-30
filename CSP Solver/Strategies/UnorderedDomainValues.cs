@@ -13,4 +13,12 @@ namespace SudokuSolver.CSP_Solver.Strategies
             return  new List<object>(variable.getDomain().getValues());
         }
     }
+
+    class UnorderedDomainValues<Tval> : DomainValueSelectionStragety<Tval>
+    {
+        public override IEnumerable<Tval> getOrderedDomainValues(Variable<Tval> variable, Assignment<Tval> assignment, ConstraintSatisfactionProblem<Tval> csp)
+        {
+            return variable.GetDomain().GetValues().ToList();
+        }
+    }
 }

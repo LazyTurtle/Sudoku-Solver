@@ -65,5 +65,10 @@ namespace SudokuSolver.CSP_Solver
             return Values;
         }
 
+        public int Size()
+        {
+            return Values.Count();
+        }
+
     }
 }

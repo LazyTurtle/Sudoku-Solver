@@ -103,5 +103,10 @@ namespace SudokuSolver.CSP_Solver
                 assignments.Add(variable, value);
             }
         }
+
+        public HashSet<Variable<Tval>> GetAssignedVariables()
+        {
+            return assignments.Keys.ToHashSet();
+        }
     }
 }

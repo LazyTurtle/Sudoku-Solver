@@ -8,13 +8,15 @@ using SudokuSolver.CSP_Solver.Constraints;
 public class SudokuSolverNode : Node
 {
     private Solver solver;
+    private Solver<int> Solver;
     private Node sudokuGrid;
     private bool isSolving = false;
-    private Dictionary<Variable, Node> relationVariablesSudoku;
-    
+    private Dictionary<object, Node> relationVariablesSudoku;
+
     public override void _Ready()
     {
         solver = new BacktrackSolver();
+        Solver = new BacktrackSolver<int>();
         sudokuGrid = GetTree().Root.GetNode("MainScene/Interface/Center/VBox/Sudoku/SudokuGrid");
         loadTest(sudokuGrid);
     }
@@ -65,13 +67,21 @@ public class SudokuSolverNode : Node
         if (isSolving)
             return;
 
+        Solver.clearEvents();
+
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
         Variable<int>[,] variables = CreateVariablesInt(grid);
         GD.Print("variables created");
+
         Assignment<int> initial_assignment = CreateAssignment(variables);
         GD.Print("assignment created");
-        List<Constraint<int>> constraints = createConstraints(variables);
+
+        List<Constraint<int>> constraints = CreateConstraints(variables);
         GD.Print("constraints created");
+
+        relationVariablesSudoku = CreateMappingVariablesNodes(variables);
+        GD.Print("mapping created");
+
 
         List<Variable<int>> variable_list = new List<Variable<int>>(9 * 9);
         for (int i = 0; i < 9; i++)
@@ -83,6 +93,13 @@ public class SudokuSolverNode : Node
         }
 
         ConstraintSatisfactionProblem<int> csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
+
+
+        Solver.SolutionFound += SolutionFoundHandler;
+        Solver.NoSolutionFound += NoSolutionFoundHandler;
+
+        Solver.Solve(csp, initial_assignment);
+
         // old code
         /*
         isSolving = true;
@@ -151,14 +168,14 @@ public class SudokuSolverNode : Node
         }
         return variables;
     }
-    private Assignment<int> CreateAssignment(Variable<int>[,] variables)
+    private Assignment<Tval> CreateAssignment<Tval>(Variable<Tval>[,] variables)
     {
-        Assignment<int> assignment = new Assignment<int>();
+        Assignment<Tval> assignment = new Assignment<Tval>();
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 9; j++)
             {
-                List<int> values = new List<int>(variables[i, j].GetDomain().GetValues());
+                List<Tval> values = new List<Tval>(variables[i, j].GetDomain().GetValues());
                 if (values.Count == 1)
                     assignment.Assign(variables[i, j], values[0]);
             }
@@ -166,31 +183,31 @@ public class SudokuSolverNode : Node
         return assignment;
     }
 
-    private List<Constraint<int>> createConstraints(Variable<int>[,] v)
+    private List<Constraint<Tval>> CreateConstraints<Tval>(Variable<Tval>[,] v)
     {
-        List<Constraint<int>> constraints = new List<Constraint<int>>();
+        List<Constraint<Tval>> constraints = new List<Constraint<Tval>>();
 
         // set all constraint for the rows
         for (int i = 0; i < 9; i++)
         {
-            List<Variable<int>> row = new List<Variable<int>>(9);
+            List<Variable<Tval>> row = new List<Variable<Tval>>(9);
             for (int j = 0; j < 9; j++)
             {
                 row.Add(v[i, j]);
             }
-            constraints.AddRange(allDiff(row));
+            constraints.AddRange(AllDiff(row));
         }
 
         // set all constraint for the columns
 
         for (int i = 0; i < 9; i++)
         {
-            List<Variable<int>> column = new List<Variable<int>>(9);
+            List<Variable<Tval>> column = new List<Variable<Tval>>(9);
             for (int j = 0; j < 9; j++)
             {
                 column.Add(v[j, i]);
             }
-            constraints.AddRange(allDiff(column));
+            constraints.AddRange(AllDiff(column));
         }
 
         // set all constraint for the sub-squares
@@ -198,30 +215,30 @@ public class SudokuSolverNode : Node
         {
             for (int j = 0; j < 3; j++)
             {
-                constraints.AddRange(allDiff(variablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
+                constraints.AddRange(AllDiff(variablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
             }
         }
 
         return constraints;
     }
 
-    private IEnumerable<Constraint<int>> allDiff(List<Variable<int>> variables)
+    private IEnumerable<Constraint<Tval>> AllDiff<Tval>(List<Variable<Tval>> variables)
     {
-        List<Constraint<int>> binaryConstraints = new List<Constraint<int>>(36);
+        List<Constraint<Tval>> binaryConstraints = new List<Constraint<Tval>>(36);
         for (int i = 0; i < variables.Count; i++)
         {
             for (int j = i + 1; j < variables.Count; j++)
             {
-                binaryConstraints.Add(new NotEquals<int>(variables[i], variables[j]));
+                binaryConstraints.Add(new NotEquals<Tval>(variables[i], variables[j]));
             }
         }
 
         return binaryConstraints;
     }
 
-    private List<Variable<int>> variablesOfBoxStartingAt(Variable<int>[,] v, int row, int column)
+    private List<Variable<Tval>> variablesOfBoxStartingAt<Tval>(Variable<Tval>[,] v, int row, int column)
     {
-        List<Variable<int>> variables = new List<Variable<int>>(9);
+        List<Variable<Tval>> variables = new List<Variable<Tval>>(9);
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -230,6 +247,34 @@ public class SudokuSolverNode : Node
             }
         }
         return variables;
+    }
+
+    private Dictionary<object, Node> CreateMappingVariablesNodes<Tval>(Variable<Tval>[,] variables)
+    {
+        Dictionary<object, Node> mapping = new Dictionary<object, Node>(9 * 9);
+        Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
+
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                mapping.Add(variables[i, j], (Node)((Godot.Collections.Array)grid[i])[j]);
+            }
+        }
+
+        return mapping;
+    }
+
+    private void SolutionFoundHandler(object source, EventArgs eventArgs)
+    {
+        GD.Print("Solution found!");
+        isSolving = false;
+    }
+
+    private void NoSolutionFoundHandler(object source, EventArgs eventArgs)
+    {
+        GD.Print("No solution found!");
+        isSolving = false;
     }
 
     private void displayResults(Assignment solution)

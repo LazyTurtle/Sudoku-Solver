@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SudokuSolver.CSP_Solver.Strategies
 {
-    class LeastConstrainingValue : DomainValueSelectionStragety
+    class LeastConstrainingValue<Tval> : DomainValueSelectionStragety<Tval>
     {
-        public override IEnumerable<object> getOrderedDomainValues(Variable variable, Assignment assignment, ConstraintSatisfactionProblem csp)
+        public override IEnumerable<Tval> getOrderedDomainValues(Variable<Tval> variable, Assignment<Tval> assignment, ConstraintSatisfactionProblem<Tval> csp)
         {
             throw new NotImplementedException();
         }

@@ -10,4 +10,8 @@ namespace SudokuSolver.CSP_Solver.Strategies
     {
         public abstract IEnumerable<object> getOrderedDomainValues(Variable variable, Assignment assignment, ConstraintSatisfactionProblem csp);
     }
+    public abstract class DomainValueSelectionStragety<Tval>
+    {
+        public abstract IEnumerable<Tval> getOrderedDomainValues(Variable<Tval> variable, Assignment<Tval> assignment, ConstraintSatisfactionProblem<Tval> csp);
+    }
 }
