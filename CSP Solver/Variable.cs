@@ -21,15 +21,32 @@ namespace SudokuSolver.CSP_Solver
         {
             if (domain == null) throw new ArgumentNullException("domain");
 
-            if (domain == null)
-                domain = new Domain();
-
             domain.update(domain);
         }
 
         public Domain getDomain()
         {
             return domain;
+        }
+    }
+
+    public class Variable<Tval>
+    {
+        private Domain<Tval> Domain;
+        public Variable(Domain<Tval> domain = null)
+        {
+            Domain = domain ?? new Domain<Tval>();
+        }
+
+        public void UpdateDomain(Domain<Tval> newDomain)
+        {
+            if (newDomain == null) throw new ArgumentNullException("newDomain");
+            Domain = newDomain;
+        }
+
+        public Domain<Tval> GetDomain()
+        {
+            return Domain;
         }
     }
 }

@@ -45,4 +45,11 @@ namespace SudokuSolver.CSP_Solver
             return values.Count;
         }
     }
+
+    public class Domain<Tval>
+    {
+        private HashSet<Tval> values;
+
+        public Domain() { }
+    }
 }
