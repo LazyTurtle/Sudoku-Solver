@@ -72,6 +72,17 @@ public class SudokuSolverNode : Node
         GD.Print("assignment created");
         List<Constraint<int>> constraints = createConstraints(variables);
         GD.Print("constraints created");
+
+        List<Variable<int>> variable_list = new List<Variable<int>>(9 * 9);
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                variable_list.Add(variables[i, j]);
+            }
+        }
+
+        ConstraintSatisfactionProblem<int> csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
         // old code
         /*
         isSolving = true;

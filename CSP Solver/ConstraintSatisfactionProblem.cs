@@ -56,9 +56,9 @@ namespace SudokuSolver.CSP_Solver
         public ConstraintSatisfactionProblem(IEnumerable<Variable<Tval>> variables, IEnumerable<Constraint<Tval>> constraints = null)
         {
             if (variables == null) throw new ArgumentNullException("variables");
-            Variables = ImmutableArray.Create<Variable<Tval>>(variables.ToArray());
+            Variables = ImmutableArray.Create(variables.ToArray());
             Console.WriteLine("Variabili: "+Variables.Length);
-            Constraints = (constraints != null) ? ImmutableArray.Create<Constraint<Tval>>(constraints.ToArray()) : ImmutableArray.Create<Constraint<Tval>>();
+            Constraints = (constraints != null) ? ImmutableArray.Create(constraints.ToArray()) : ImmutableArray.Create<Constraint<Tval>>();
             Console.WriteLine("Constraints: " + Constraints.Length);
             NeighboursTable = CreateNeighboursArcs(Constraints).ToImmutableDictionary();
             Console.WriteLine("NeighboursTable: " + NeighboursTable.Count());
@@ -78,12 +78,18 @@ namespace SudokuSolver.CSP_Solver
                     if (neighbours.TryGetValue(constraint.ElementAt(0), out neighbourList))
                     {
                         neighbourList.Add(constraint.ElementAt(1));
-                        neighbours.TryGetValue(constraint.ElementAt(1), out neighbourList);
-                        neighbourList.Add(constraint.ElementAt(0));
                     }
                     else
                     {
                         neighbours.Add(constraint.ElementAt(0), new List<Variable<Tval>>() { constraint.ElementAt(1) });
+                    }
+
+                    if (neighbours.TryGetValue(constraint.ElementAt(1), out neighbourList))
+                    {
+                        neighbourList.Add(constraint.ElementAt(0));
+                    }
+                    else
+                    {
                         neighbours.Add(constraint.ElementAt(1), new List<Variable<Tval>>() { constraint.ElementAt(0) });
                     }
                 }
