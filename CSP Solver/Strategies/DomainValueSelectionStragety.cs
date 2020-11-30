@@ -8,6 +8,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     public abstract class DomainValueSelectionStragety
     {
-        public abstract IEnumerable<object> getOrderedDomainValues(Variable variable, Assignment assignment, ConstrainSatisfactionProblem csp);
+        public abstract IEnumerable<object> getOrderedDomainValues(Variable variable, Assignment assignment, ConstraintSatisfactionProblem csp);
     }
 }

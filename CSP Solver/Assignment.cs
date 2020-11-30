@@ -67,4 +67,41 @@ namespace SudokuSolver.CSP_Solver
             return "count: "+assignments.Count()+" and: "+ assignments.ToString();
         }
     }
+
+    public class Assignment<Tval>
+    {
+        private Dictionary<Variable<Tval>, Tval> assignments;
+
+        public Assignment(Dictionary<Variable<Tval>, Tval> initialAssignment = null)
+        {
+            assignments = initialAssignment ?? new Dictionary<Variable<Tval>, Tval>();
+        }
+
+        public Assignment(int numberOfVariables)
+        {
+            assignments = new Dictionary<Variable<Tval>, Tval>(numberOfVariables);
+        }
+
+        public bool IsComplete(IEnumerable<Variable<Tval>> variables)
+        {
+            return variables.Count() == assignments.Keys.Count;
+        }
+
+        public bool IsConsistent(IEnumerable<Constraint<Tval>> constraints)
+        {
+            return (constraints.Any(c => c.IsViolated(this))) ? false : true;
+        }
+
+        public void Assign(Variable<Tval> variable, Tval value)
+        {
+            if (assignments.ContainsKey(variable))
+            {
+                assignments[variable] = value;
+            }
+            else
+            {
+                assignments.Add(variable, value);
+            }
+        }
+    }
 }

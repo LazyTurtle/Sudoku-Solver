@@ -48,8 +48,22 @@ namespace SudokuSolver.CSP_Solver
 
     public class Domain<Tval>
     {
-        private HashSet<Tval> values;
+        private HashSet<Tval> Values;
 
-        public Domain() { }
+        public Domain(IEnumerable<Tval> values = null)
+        {
+            Values = (values == null) ? new HashSet<Tval>() : new HashSet<Tval>(values);
+        }
+
+        public Domain(Domain<Tval> domain)
+        {
+            Values = new HashSet<Tval>(domain.Values);
+        }
+
+        public HashSet<Tval> GetValues()
+        {
+            return Values;
+        }
+
     }
 }

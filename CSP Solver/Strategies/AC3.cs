@@ -9,7 +9,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     class AC3 : InferenceStrategy
     {
-        public override InferenceResults infer(ConstrainSatisfactionProblem csp, Variable variable, object value)
+        public override InferenceResults infer(ConstraintSatisfactionProblem csp, Variable variable, object value)
         {
             InferenceResults results = new InferenceResults();
 
@@ -37,7 +37,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
             return results;
         }
 
-        private Queue<Tuple<Variable, Variable>> CreateListOfArcs<Tconstraint>(ConstrainSatisfactionProblem csp)
+        private Queue<Tuple<Variable, Variable>> CreateListOfArcs<Tconstraint>(ConstraintSatisfactionProblem csp)
         {
             Queue<Tuple<Variable, Variable>> arcs = new Queue<Tuple<Variable, Variable>>();
             foreach (Constraint c in csp.getConstraints())
@@ -49,7 +49,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
             return arcs;
         }
 
-        private bool revise(ConstrainSatisfactionProblem csp, Variable variableX, Variable variableY, InferenceResults results)
+        private bool revise(ConstraintSatisfactionProblem csp, Variable variableX, Variable variableY, InferenceResults results)
         {
             bool revised = false;
             Assignment assignment = new Assignment();

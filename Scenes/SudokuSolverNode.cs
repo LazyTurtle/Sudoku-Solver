@@ -61,8 +61,19 @@ public class SudokuSolverNode : Node
 
     public void OnButtonPressed()
     {
+        
         if (isSolving)
             return;
+
+        Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
+        Variable<int>[,] variables = CreateVariablesInt(grid);
+        GD.Print("variables created");
+        Assignment<int> initial_assignment = CreateAssignment(variables);
+        GD.Print("assignment created");
+        List<Constraint<int>> constraints = createConstraints(variables);
+        GD.Print("constraints created");
+        // old code
+        /*
         isSolving = true;
         Godot.Collections.Array grid = (Godot.Collections.Array) sudokuGrid.Call("export_grid");
 
@@ -85,7 +96,7 @@ public class SudokuSolverNode : Node
         }
 
         GD.Print("start solving");
-        Assignment solution = solver.solve(new ConstrainSatisfactionProblem(listOfVariables, constraints), initial_assignment);
+        Assignment solution = solver.solve(new ConstraintSatisfactionProblem(listOfVariables, constraints), initial_assignment);
 
         if (solution != null)
         {
@@ -96,6 +107,118 @@ public class SudokuSolverNode : Node
         {
             GD.Print("No solution found");
         }
+        */
+    }
+
+    private Variable<int>[,] CreateVariablesInt(Godot.Collections.Array grid)
+    {
+        Variable<int>[,] variables = new Variable<int>[9, 9];
+        for (int i = 0; i < 9; ++i)
+        {
+            Godot.Collections.Array row = (Godot.Collections.Array)grid[i];
+            for (int j = 0; j < 9; ++j)
+            {
+                int[] values;
+                Node cell = (Node)row[j];
+                int cell_value = (int)cell.Call("get_selected_id");
+                if (cell_value == 0)
+                {
+                    values = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                }
+                else
+                {
+                    values = new int[] { cell_value };
+                }
+                HashSet<object> hashSet = new HashSet<object>();
+                foreach (int n in values)
+                {
+                    hashSet.Add(n);
+                }
+
+                variables[i, j] = new Variable<int>(new Domain<int>(values));
+            }
+        }
+        return variables;
+    }
+    private Assignment<int> CreateAssignment(Variable<int>[,] variables)
+    {
+        Assignment<int> assignment = new Assignment<int>();
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                List<int> values = new List<int>(variables[i, j].GetDomain().GetValues());
+                if (values.Count == 1)
+                    assignment.Assign(variables[i, j], values[0]);
+            }
+        }
+        return assignment;
+    }
+
+    private List<Constraint<int>> createConstraints(Variable<int>[,] v)
+    {
+        List<Constraint<int>> constraints = new List<Constraint<int>>();
+
+        // set all constraint for the rows
+        for (int i = 0; i < 9; i++)
+        {
+            List<Variable<int>> row = new List<Variable<int>>(9);
+            for (int j = 0; j < 9; j++)
+            {
+                row.Add(v[i, j]);
+            }
+            constraints.AddRange(allDiff(row));
+        }
+
+        // set all constraint for the columns
+
+        for (int i = 0; i < 9; i++)
+        {
+            List<Variable<int>> column = new List<Variable<int>>(9);
+            for (int j = 0; j < 9; j++)
+            {
+                column.Add(v[j, i]);
+            }
+            constraints.AddRange(allDiff(column));
+        }
+
+        // set all constraint for the sub-squares
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                constraints.AddRange(allDiff(variablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
+            }
+        }
+
+        return constraints;
+    }
+
+    private IEnumerable<Constraint<int>> allDiff(List<Variable<int>> variables)
+    {
+        List<Constraint<int>> binaryConstraints = new List<Constraint<int>>(36);
+        for (int i = 0; i < variables.Count; i++)
+        {
+            for (int j = i + 1; j < variables.Count; j++)
+            {
+                binaryConstraints.Add(new NotEquals<int>(variables[i], variables[j]));
+            }
+        }
+
+        return binaryConstraints;
+    }
+
+    private List<Variable<int>> variablesOfBoxStartingAt(Variable<int>[,] v, int row, int column)
+    {
+        List<Variable<int>> variables = new List<Variable<int>>(9);
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                variables.Add(v[row + i, column + j]);
+            }
+        }
+        return variables;
     }
 
     private void displayResults(Assignment solution)

@@ -8,6 +8,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     public abstract class InferenceStrategy
     {
-        abstract public InferenceResults infer(ConstrainSatisfactionProblem csp, Variable variable, object value);
+        abstract public InferenceResults infer(ConstraintSatisfactionProblem csp, Variable variable, object value);
     }
 }

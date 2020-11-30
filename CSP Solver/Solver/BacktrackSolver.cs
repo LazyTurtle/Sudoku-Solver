@@ -24,7 +24,7 @@ namespace SudokuSolver.CSP_Solver.Solver
 
         }
 
-        public Assignment backtrack(ConstrainSatisfactionProblem csp, Assignment assignment)
+        public Assignment backtrack(ConstraintSatisfactionProblem csp, Assignment assignment)
         {
             if (assignment.isComplete(csp.getVariables()))
                 return assignment;
@@ -54,7 +54,7 @@ namespace SudokuSolver.CSP_Solver.Solver
             return null;
         }
 
-        public override Assignment solve(ConstrainSatisfactionProblem csp, Assignment initial_assignment = null)
+        public override Assignment solve(ConstraintSatisfactionProblem csp, Assignment initial_assignment = null)
         {
             initial_assignment = initial_assignment ?? new Assignment();
             InferenceResults initialResults = inferenceStrategy.infer(csp, null, null);

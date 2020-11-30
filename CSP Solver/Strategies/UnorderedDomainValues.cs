@@ -8,7 +8,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     class UnorderedDomainValues : DomainValueSelectionStragety
     {
-        public override IEnumerable<object> getOrderedDomainValues(Variable variable, Assignment assignment, ConstrainSatisfactionProblem csp)
+        public override IEnumerable<object> getOrderedDomainValues(Variable variable, Assignment assignment, ConstraintSatisfactionProblem csp)
         {
             return  new List<object>(variable.getDomain().getValues());
         }

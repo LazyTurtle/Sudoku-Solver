@@ -8,6 +8,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     public abstract class VariableSelectionStrategy
     {
-        public abstract Variable selectUnassignedVariable(ConstrainSatisfactionProblem csp, Assignment assignment);
+        public abstract Variable selectUnassignedVariable(ConstraintSatisfactionProblem csp, Assignment assignment);
     }
 }

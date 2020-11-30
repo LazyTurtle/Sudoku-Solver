@@ -8,6 +8,6 @@ namespace SudokuSolver.CSP_Solver.Solver
 {
     public abstract class Solver
     {
-        public abstract Assignment solve(ConstrainSatisfactionProblem csp, Assignment initial_assignment = null);
+        public abstract Assignment solve(ConstraintSatisfactionProblem csp, Assignment initial_assignment = null);
     }
 }
