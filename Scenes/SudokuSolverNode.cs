@@ -37,14 +37,14 @@ public class SudokuSolverNode : Node
         */
         
         List<int>test= new List<int>(new int[] {
-        1, 2, 3, 4, 5, 6, 0, 8, 9,
+        1, 2, 0, 0, 5, 6, 0, 8, 9,
         4, 5, 0, 7, 0, 9, 1, 0, 3,
         7, 8, 0, 1, 2, 3, 0, 0, 6,
-        0, 0, 4, 5, 6, 7, 8, 9, 1,
-        5, 6, 0, 8, 0, 1, 2, 3, 0,
-        8, 9, 0, 2, 3, 4, 5, 6, 7,
-        3, 4, 5, 6, 0, 8, 9, 1, 2,
-        6, 7, 0, 9, 1, 2, 3, 0, 5,
+        0, 0, 4, 5, 6, 0, 8, 9, 1,
+        5, 6, 0, 8, 0, 1, 0, 3, 0,
+        0, 9, 0, 0, 0, 4, 0, 6, 7,
+        3, 0, 0, 6, 0, 8, 0, 1, 2,
+        6, 7, 0, 0, 1, 2, 3, 0, 5,
         0, 1, 2, 3, 4, 5, 6, 7, 8,
         });
         
@@ -67,8 +67,11 @@ public class SudokuSolverNode : Node
         Godot.Collections.Array grid = (Godot.Collections.Array) sudokuGrid.Call("export_grid");
 
         Variable[,] variables = CreateVariables(grid);
+        GD.Print("variables created");
         Assignment initial_assignment = createAssignment(variables);
+        GD.Print("assignment created");
         List<Constraint> constraints = createConstraints(variables);
+        GD.Print("constraints created");
 
         List<Variable> listOfVariables = new List<Variable>();
         relationVariablesSudoku = new Dictionary<Variable, Node>();
@@ -81,7 +84,7 @@ public class SudokuSolverNode : Node
             }
         }
 
-        
+        GD.Print("start solving");
         Assignment solution = solver.solve(new ConstrainSatisfactionProblem(listOfVariables, constraints), initial_assignment);
 
         if (solution != null)
@@ -110,10 +113,10 @@ public class SudokuSolverNode : Node
     {
         List<Constraint> constraints = new List<Constraint>();
 
-        List<Variable> row = new List<Variable>();
+        // set all constraint for the rows
         for (int i = 0; i < 9; i++)
         {
-            row.Clear();
+            List<Variable> row = new List<Variable>(9);
             for (int j = 0; j < 9; j++)
             {
                 row.Add(v[i, j]);
@@ -121,11 +124,11 @@ public class SudokuSolverNode : Node
             constraints.AddRange(allDiff(row));
         }
 
-
-        List<Variable> column = new List<Variable>();
+        // set all constraint for the columns
+        
         for (int i = 0; i < 9; i++)
         {
-            column.Clear();
+            List<Variable> column = new List<Variable>(9);
             for (int j = 0; j < 9; j++)
             {
                 column.Add(v[j, i]);
@@ -133,6 +136,7 @@ public class SudokuSolverNode : Node
             constraints.AddRange(allDiff(column));
         }
 
+        // set all constraint for the sub-squares
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -146,7 +150,7 @@ public class SudokuSolverNode : Node
 
     private List<Variable> variablesOfBoxStartingAt(Variable[,] v, int row, int column)
     {
-        List<Variable> variables = new List<Variable>();
+        List<Variable> variables = new List<Variable>(9);
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -204,7 +208,7 @@ public class SudokuSolverNode : Node
 
     private List<Constraint> allDiff(List<Variable> variables)
     {
-        List<Constraint> binaryConstraints = new List<Constraint>();
+        List<Constraint> binaryConstraints = new List<Constraint>(36);
         for (int i = 0; i < variables.Count ; i++)
         {
             for (int j = i+1; j < variables.Count; j++)
@@ -214,10 +218,5 @@ public class SudokuSolverNode : Node
         }
         
         return binaryConstraints;
-    }
-
-    private List<Constraint> allDiff(params Variable[] variables)
-    {
-        return allDiff(new List<Variable>(variables));
     }
 }
