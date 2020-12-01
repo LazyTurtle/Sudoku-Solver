@@ -33,7 +33,7 @@ namespace SudokuSolver.CSP_Solver.Solver
             SolutionSearchCompleate(this, args);
         }
 
-        public void ClearEvents()
+        public virtual void ClearEvents()
         {
             SolutionSearchCompleate = null;
         }

@@ -27,6 +27,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 Variable<Tval> X = arc.Item1, Y = arc.Item2;
                 if (Revise(csp, X, Y, results))
                 {
+                    //Console.WriteLine("Revised: " + X.ToString());
                     if (X.GetDomain().Size() == 0)
                     {
                         results.InconsistencyFound();
@@ -56,6 +57,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 foreach (Tval valueY in variableY.GetDomain().GetValues())
                 {
                     assignment.Assign(variableY, valueY);
+                    // TODO: remove this consistent call, is one of the major bottleneck of the program
                     if (assignment.IsConsistent(csp.GetConstraints()))
                     {
                         satisfiable = true;

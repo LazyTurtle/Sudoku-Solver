@@ -65,7 +65,7 @@ public class SudokuSolverNode : Node
         
         if (isSolving)
             return;
-
+        isSolving = true;
         Solver.ClearEvents();
 
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
@@ -101,7 +101,25 @@ public class SudokuSolverNode : Node
     private void StartSolvingSudoku(ConstraintSatisfactionProblem<int> csp, Assignment<int> initial_assignment)
     {
         Solver.SolutionSearchCompleate += SearchCompleteEventHandler;
+        ((BacktrackSolver<int>)Solver).VariableAssigned += OnVariableAssignedEventHandler;
+        ((BacktrackSolver<int>)Solver).AssignmentRemoved += OnAssignmentRemoved;
         Solver.Solve(csp, initial_assignment);
+    }
+
+    private void OnAssignmentRemoved<Tval>(object source, VariableAssignmentEventArgs<Tval> eventArgs)
+    {
+        if (relationVariablesSudoku.TryGetValue(eventArgs.Variable, out Node cell))
+        {
+            cell.Call("select", 0);
+        }
+    }
+
+    private void OnVariableAssignedEventHandler<Tval>(object source, VariableAssignmentEventArgs<Tval> eventArgs)
+    {
+        if(relationVariablesSudoku.TryGetValue(eventArgs.Variable, out Node cell))
+        {
+            cell.Call("select", eventArgs.AssignedValue);
+        }
     }
 
     private Variable<int>[,] CreateVariablesInt(Godot.Collections.Array grid)
@@ -181,7 +199,7 @@ public class SudokuSolverNode : Node
         {
             for (int j = 0; j < 3; j++)
             {
-                constraints.AddRange(AllDiff(variablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
+                constraints.AddRange(AllDiff(VariablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
             }
         }
 
@@ -202,7 +220,7 @@ public class SudokuSolverNode : Node
         return binaryConstraints;
     }
 
-    private List<Variable<Tval>> variablesOfBoxStartingAt<Tval>(Variable<Tval>[,] v, int row, int column)
+    private List<Variable<Tval>> VariablesOfBoxStartingAt<Tval>(Variable<Tval>[,] v, int row, int column)
     {
         List<Variable<Tval>> variables = new List<Variable<Tval>>(9);
         for (int i = 0; i < 3; i++)
@@ -235,16 +253,16 @@ public class SudokuSolverNode : Node
     {
         if (eventArgs.SolutionFound)
         {
-            displayResults(eventArgs.Solution);
+            DisplayResults(eventArgs.Solution);
             GD.Print("Solution Found!");
         }
         else
         {
             GD.Print("No solution found");
         }
-
+        isSolving = false;
     }
-    private void displayResults<Tval>(Assignment<Tval> solution)
+    private void DisplayResults<Tval>(Assignment<Tval> solution)
     {
         foreach (Variable<Tval> variable in relationVariablesSudoku.Keys)
         {

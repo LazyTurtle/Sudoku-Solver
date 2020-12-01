@@ -9,8 +9,21 @@ using Godot;
 
 namespace SudokuSolver.CSP_Solver.Solver
 {
+
+    public class VariableAssignmentEventArgs<Tval> : EventArgs
+    {
+        public Variable<Tval> Variable { get; set; }
+        public Tval AssignedValue { get; set; }
+    }
     public class BacktrackSolver<Tval> : Solver<Tval>
     {
+
+        public delegate void AssignedVariableEventHandler(object source, VariableAssignmentEventArgs<Tval> eventArgs);
+        public delegate void AssignmentRemovedEventHandler(object source, VariableAssignmentEventArgs<Tval> eventArgs);
+
+        public event AssignedVariableEventHandler VariableAssigned;
+        public event AssignmentRemovedEventHandler AssignmentRemoved;
+
         private InferenceStrategy<Tval> inferenceStrategy;
         private VariableSelectionStrategy<Tval> variableSelectionStrategy;
         private DomainValueSelectionStragety<Tval> domainValueSelectionStragety;
@@ -54,8 +67,7 @@ namespace SudokuSolver.CSP_Solver.Solver
             foreach (Tval value in domainValueSelectionStragety.getOrderedDomainValues(variable, assignment, csp))
             {
                 assignment.Assign(variable, value);
-                Console.WriteLine(variable.ToString());
-                Console.WriteLine("assigned: " + value.ToString());
+                OnVariableAssigned(variable, value);
                 InferenceResults<Tval> inference = new InferenceResults<Tval>();
                 if (assignment.IsConsistent(csp.GetConstraints()))
                 {
@@ -69,10 +81,36 @@ namespace SudokuSolver.CSP_Solver.Solver
                 }
                 assignment.RemoveAssignment(variable);
                 inference.RestoreOldDomains();
-                Console.WriteLine("removed: " + value);
+                OnAssignmentRemoved(variable);
             }
 
             return null;
         }
+
+        private void OnVariableAssigned(Variable<Tval> variable, Tval value)
+        {
+            GD.Print("Variable assigned: "+variable.ToString());
+            GD.Print("Selected Value: " + value.ToString());
+            VariableAssignmentEventArgs<Tval> args = new VariableAssignmentEventArgs<Tval>();
+            args.Variable = variable;
+            args.AssignedValue = value;
+            VariableAssigned(this, args);
+        }
+
+        private void OnAssignmentRemoved(Variable<Tval> variable)
+        {
+            GD.Print("Variable removed: "+variable.ToString());
+            VariableAssignmentEventArgs<Tval> args = new VariableAssignmentEventArgs<Tval>();
+            args.Variable = variable;
+            AssignmentRemoved(this, args);
+        }
+
+        public override void ClearEvents()
+        {
+            base.ClearEvents();
+            VariableAssigned = null;
+            AssignmentRemoved = null;
+        }
+
     }
 }
