@@ -108,5 +108,21 @@ namespace SudokuSolver.CSP_Solver
         {
             return assignments.Keys.ToHashSet();
         }
+
+        public bool RemoveAssignment(Variable<Tval> variable)
+        {
+            return assignments.Remove(variable);
+        }
+
+        public Tval ValueOf(Variable<Tval> variable)
+        {
+            assignments.TryGetValue(variable, out Tval value);
+            return value;
+        }
+
+        public bool HasBeenAssigned(Variable<Tval> variable)
+        {
+            return assignments.ContainsKey(variable);
+        }
     }
 }

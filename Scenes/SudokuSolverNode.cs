@@ -67,7 +67,7 @@ public class SudokuSolverNode : Node
         if (isSolving)
             return;
 
-        Solver.clearEvents();
+        Solver.ClearEvents();
 
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
         Variable<int>[,] variables = CreateVariablesInt(grid);
@@ -94,11 +94,15 @@ public class SudokuSolverNode : Node
 
         ConstraintSatisfactionProblem<int> csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
 
-
         Solver.SolutionFound += SolutionFoundHandler;
         Solver.NoSolutionFound += NoSolutionFoundHandler;
 
-        Solver.Solve(csp, initial_assignment);
+        Assignment<int> solution = Solver.Solve(csp, initial_assignment);
+
+        if (solution != null)
+        {
+            displayResults(solution);
+        }
 
         // old code
         /*
@@ -163,7 +167,7 @@ public class SudokuSolverNode : Node
                     hashSet.Add(n);
                 }
 
-                variables[i, j] = new Variable<int>(new Domain<int>(values));
+                variables[i, j] = new Variable<int>(new Domain<int>(values),i+"-"+j);
             }
         }
         return variables;
@@ -284,6 +288,17 @@ public class SudokuSolverNode : Node
             Node cell;
             relationVariablesSudoku.TryGetValue(variable, out cell);
             int number =  (int)solution.valueOf(variable);
+            cell.Call("select", number);
+        }
+    }
+
+    private void displayResults<Tval>(Assignment<Tval> solution)
+    {
+        foreach (Variable<Tval> variable in relationVariablesSudoku.Keys)
+        {
+            Node cell;
+            relationVariablesSudoku.TryGetValue(variable, out cell);
+            Tval number = solution.ValueOf(variable);
             cell.Call("select", number);
         }
     }

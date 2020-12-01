@@ -86,61 +86,52 @@ namespace SudokuSolver.CSP_Solver.Strategies
     {
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value)
         {
-            /*
-             * InferenceResults results = new InferenceResults();
+            return Infer(csp);
+        }
 
-            Queue<Tuple<Variable, Variable>> arcs = CreateListOfArcs<BinaryNotEquals>(csp);
-            while (arcs.Count > 0)
+        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp)
+        {
+            InferenceResults<Tval> results = new InferenceResults<Tval>();
+
+            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
+
+            while (queueOfArcs.Count > 0)
             {
-                Tuple<Variable, Variable> arc = arcs.Dequeue();
+                Tuple<Variable<Tval>, Variable<Tval>> arc = queueOfArcs.Dequeue();
 
-                Variable X = arc.Item1, Y = arc.Item2;
-                if (revise(csp, X, Y, results))
+                Variable<Tval> X = arc.Item1, Y = arc.Item2;
+                if (Revise(csp, X, Y, results))
                 {
-                    if (X.getDomain().getValues().Count() == 0)
+                    if (X.GetDomain().Size() == 0)
                     {
-                        results.inconsistencyFound();
+                        results.InconsistencyFound();
                         return results;
                     }
-                    foreach (Variable neighbour in csp.neighboursOf(X))
+                    foreach (Variable<Tval> neighbour in csp.GetArcsOf(X))
                     {
-                        if (neighbour != Y)
-                            arcs.Enqueue(new Tuple<Variable, Variable>(neighbour, X));
+                        queueOfArcs.Enqueue(new Tuple<Variable<Tval>, Variable<Tval>>(neighbour, X));
                     }
                 }
             }
 
-            return results;*/
-            throw new NotImplementedException();
+            return results;
         }
 
-        private Queue<Tuple<Variable, Variable>> CreateListOfArcs<Tconstraint>(ConstraintSatisfactionProblem csp)
-        {
-            Queue<Tuple<Variable, Variable>> arcs = new Queue<Tuple<Variable, Variable>>();
-            foreach (Constraint c in csp.getConstraints())
-            {
-                // TODO: AC3 only uses binary constraints, not only binarynotequals
-                if (c is Tconstraint)
-                    arcs.Enqueue(new Tuple<Variable, Variable>(c.ElementAt(0), c.ElementAt(1)));
-            }
-            return arcs;
-        }
-
-        private bool revise(ConstraintSatisfactionProblem csp, Variable variableX, Variable variableY, InferenceResults results)
+        private bool Revise(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variableX, Variable<Tval> variableY, InferenceResults<Tval> results)
         {
             bool revised = false;
-            Assignment assignment = new Assignment();
-            Domain oldDomain = new Domain(variableX.getDomain().getValues());
-            List<object> domain_values = new List<object>(oldDomain.getValues());
-            foreach (object valueX in domain_values)
+            Assignment<Tval> assignment = new Assignment<Tval>();
+            Domain<Tval> oldDomain = new Domain<Tval>(variableX.GetDomain());
+            List<Tval> domain_values = new List<Tval>(oldDomain.GetValues());
+            foreach (Tval valueX in domain_values)
             {
-                assignment.assign(variableX, valueX);
+                assignment.Assign(variableX, valueX);
                 bool satisfiable = false;
 
-                foreach (object valueY in variableY.getDomain().getValues())
+                foreach (Tval valueY in variableY.GetDomain().GetValues())
                 {
-                    assignment.assign(variableY, valueY);
-                    if (assignment.IsConsistent(csp.getConstraints()))
+                    assignment.Assign(variableY, valueY);
+                    if (assignment.IsConsistent(csp.GetConstraints()))
                     {
                         satisfiable = true;
                         break;
@@ -148,12 +139,12 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 }
                 if (!satisfiable)
                 {
-                    variableX.getDomain().removeValue(valueX);
+                    variableX.GetDomain().RemoveValue(valueX);
                     revised = true;
                 }
             }
             if (revised)
-                results.storeDomainForVariable(variableX, oldDomain);
+                results.StoreDomainForVariable(variableX, oldDomain);
 
             return revised;
         }

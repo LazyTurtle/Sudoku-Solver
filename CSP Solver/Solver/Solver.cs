@@ -30,7 +30,7 @@ namespace SudokuSolver.CSP_Solver.Solver
             NoSolutionFound(this, EventArgs.Empty);
         }
 
-        internal void clearEvents()
+        internal void ClearEvents()
         {
             SolutionFound = null;
             NoSolutionFound = null;

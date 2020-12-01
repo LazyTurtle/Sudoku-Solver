@@ -70,5 +70,17 @@ namespace SudokuSolver.CSP_Solver
             return Values.Count();
         }
 
+        public void RemoveValue(Tval value)
+        {
+            Values.Remove(value);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder s = new StringBuilder("values: ");
+            foreach (Tval v in Values)
+                s.Append( " " + v.ToString());
+            return s.ToString();
+        }
     }
 }

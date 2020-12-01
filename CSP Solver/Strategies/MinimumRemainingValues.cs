@@ -26,7 +26,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
     {
         public override Variable<Tval> SelectUnassignedVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment)
         {
-            HashSet<Variable<Tval>> unassigned_variables = new HashSet<Variable<Tval>>();
+            HashSet<Variable<Tval>> unassigned_variables = new HashSet<Variable<Tval>>(csp.GetVariables());
             unassigned_variables.ExceptWith(assignment.GetAssignedVariables());
 
             Variable<Tval> variable = unassigned_variables.First();

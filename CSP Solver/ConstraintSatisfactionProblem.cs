@@ -52,6 +52,7 @@ namespace SudokuSolver.CSP_Solver
         private ImmutableArray<Variable<Tval>> Variables;
         private ImmutableArray<Constraint<Tval>> Constraints;
         private ImmutableDictionary<Variable<Tval>, List<Variable<Tval>>> NeighboursTable;
+        private List<Tuple<Variable<Tval>, Variable<Tval>>> arcs;
 
         public ConstraintSatisfactionProblem(IEnumerable<Variable<Tval>> variables, IEnumerable<Constraint<Tval>> constraints = null)
         {
@@ -62,6 +63,8 @@ namespace SudokuSolver.CSP_Solver
             Console.WriteLine("Constraints: " + Constraints.Length);
             NeighboursTable = CreateNeighboursArcs(Constraints).ToImmutableDictionary();
             Console.WriteLine("NeighboursTable: " + NeighboursTable.Count());
+            arcs = CreateListOfArcs();
+            Console.WriteLine("Arcs: " + arcs.Count());
         }
 
         // This is only used for binary constraints
@@ -96,6 +99,38 @@ namespace SudokuSolver.CSP_Solver
             }
 
             return neighbours;
+        }
+
+        private List<Tuple<Variable<Tval>, Variable<Tval>>> CreateListOfArcs()
+        {
+            List<Tuple<Variable<Tval>, Variable<Tval>>> list = new List<Tuple<Variable<Tval>, Variable<Tval>>>(Constraints.Length);
+            foreach (Constraint<Tval> constraint in Constraints)
+            {
+                list.Add(new Tuple<Variable<Tval>, Variable<Tval>>(constraint.ElementAt(0), constraint.ElementAt(1)));
+            }
+            return list;
+        }
+
+        public IEnumerable<Variable<Tval>> GetVariables()
+        {
+            return Variables;
+        }
+
+        public IEnumerable<Constraint<Tval>> GetConstraints()
+        {
+            return Constraints;
+        }
+
+        public List<Variable<Tval>> GetArcsOf(Variable<Tval> variable)
+        {
+            List<Variable<Tval>> list;
+            NeighboursTable.TryGetValue(variable, out list);
+            return list;
+        }
+
+        public List<Tuple<Variable<Tval>, Variable<Tval>>> GetArcs()
+        {
+            return arcs;
         }
     }
 }
