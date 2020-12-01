@@ -94,50 +94,13 @@ public class SudokuSolverNode : Node
 
         Solver.SolutionFound += SolutionFoundHandler;
         Solver.NoSolutionFound += NoSolutionFoundHandler;
-
+        
         Assignment<int> solution = Solver.Solve(csp, initial_assignment);
 
         if (solution != null)
         {
             displayResults(solution);
         }
-
-        // old code
-        /*
-        isSolving = true;
-        Godot.Collections.Array grid = (Godot.Collections.Array) sudokuGrid.Call("export_grid");
-
-        Variable[,] variables = CreateVariables(grid);
-        GD.Print("variables created");
-        Assignment initial_assignment = createAssignment(variables);
-        GD.Print("assignment created");
-        List<Constraint> constraints = createConstraints(variables);
-        GD.Print("constraints created");
-
-        List<Variable> listOfVariables = new List<Variable>();
-        relationVariablesSudoku = new Dictionary<Variable, Node>();
-        for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                relationVariablesSudoku.Add(variables[i, j], (Node)((Godot.Collections.Array)grid[i])[j]);
-                listOfVariables.Add(variables[i, j]);
-            }
-        }
-
-        GD.Print("start solving");
-        Assignment solution = solver.solve(new ConstraintSatisfactionProblem(listOfVariables, constraints), initial_assignment);
-
-        if (solution != null)
-        {
-            GD.Print("solved!");
-            displayResults(solution);
-        }
-        else
-        {
-            GD.Print("No solution found");
-        }
-        */
     }
 
     private Variable<int>[,] CreateVariablesInt(Godot.Collections.Array grid)

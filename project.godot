@@ -28,6 +28,10 @@ config/icon="res://icon.png"
 
 enabled=PoolStringArray( "mono_debugger" )
 
+[mono]
+
+profiler/enabled=true
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
