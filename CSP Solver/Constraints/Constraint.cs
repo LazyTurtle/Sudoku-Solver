@@ -7,15 +7,6 @@ using System.Threading.Tasks;
 
 namespace SudokuSolver.CSP_Solver
 {
-    public abstract class Constraint
-    {
-        protected IReadOnlyCollection<Variable> scope;
-
-        public abstract bool isSatisfied(Assignment assignment);
-        public abstract bool IsViolated(Assignment assignment);
-        public abstract Variable ElementAt(int index);
-    }
-
     public abstract class Constraint<Tval>
     {
         protected ImmutableArray<Variable<Tval>> scope;

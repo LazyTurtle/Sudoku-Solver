@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace SudokuSolver.CSP_Solver.Strategies
 {
-    public abstract class InferenceStrategy
-    {
-        abstract public InferenceResults infer(ConstraintSatisfactionProblem csp, Variable variable, object value);
-    }
-
     public abstract class InferenceStrategy<Tval>
     {
         abstract public InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value);

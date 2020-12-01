@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace SudokuSolver.CSP_Solver.Solver
 {
-    public abstract class Solver
-    {
-        public abstract Assignment solve(ConstraintSatisfactionProblem csp, Assignment initial_assignment = null);
-    }
-
     public abstract class Solver<Tval>
     {
         public delegate void SolutionFoundEventHandler(object source, EventArgs eventArgs);

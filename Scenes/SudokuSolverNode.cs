@@ -7,7 +7,6 @@ using SudokuSolver.CSP_Solver.Constraints;
 
 public class SudokuSolverNode : Node
 {
-    private Solver solver;
     private Solver<int> Solver;
     private Node sudokuGrid;
     private bool isSolving = false;
@@ -15,7 +14,6 @@ public class SudokuSolverNode : Node
 
     public override void _Ready()
     {
-        solver = new BacktrackSolver();
         Solver = new BacktrackSolver<int>();
         sudokuGrid = GetTree().Root.GetNode("MainScene/Interface/Center/VBox/Sudoku/SudokuGrid");
         loadTest(sudokuGrid);
@@ -280,18 +278,6 @@ public class SudokuSolverNode : Node
         GD.Print("No solution found!");
         isSolving = false;
     }
-
-    private void displayResults(Assignment solution)
-    {
-        foreach(Variable variable in relationVariablesSudoku.Keys)
-        {
-            Node cell;
-            relationVariablesSudoku.TryGetValue(variable, out cell);
-            int number =  (int)solution.valueOf(variable);
-            cell.Call("select", number);
-        }
-    }
-
     private void displayResults<Tval>(Assignment<Tval> solution)
     {
         foreach (Variable<Tval> variable in relationVariablesSudoku.Keys)
@@ -301,116 +287,5 @@ public class SudokuSolverNode : Node
             Tval number = solution.ValueOf(variable);
             cell.Call("select", number);
         }
-    }
-
-    private List<Constraint> createConstraints(Variable[,] v)
-    {
-        List<Constraint> constraints = new List<Constraint>();
-
-        // set all constraint for the rows
-        for (int i = 0; i < 9; i++)
-        {
-            List<Variable> row = new List<Variable>(9);
-            for (int j = 0; j < 9; j++)
-            {
-                row.Add(v[i, j]);
-            }
-            constraints.AddRange(allDiff(row));
-        }
-
-        // set all constraint for the columns
-        
-        for (int i = 0; i < 9; i++)
-        {
-            List<Variable> column = new List<Variable>(9);
-            for (int j = 0; j < 9; j++)
-            {
-                column.Add(v[j, i]);
-            }
-            constraints.AddRange(allDiff(column));
-        }
-
-        // set all constraint for the sub-squares
-        for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                constraints.AddRange(allDiff(variablesOfBoxStartingAt(v, (i%3)*3, j*3)));
-            }
-        }
-
-        return constraints;
-    }
-
-    private List<Variable> variablesOfBoxStartingAt(Variable[,] v, int row, int column)
-    {
-        List<Variable> variables = new List<Variable>(9);
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                variables.Add(v[row + i, column + j]);
-            }
-        }
-        return variables;
-    }
-
-    private Variable[,] CreateVariables(Godot.Collections.Array grid)
-    {
-        Variable[,] variables = new Variable[9, 9];
-        for (int i = 0; i < 9; ++i)
-        {
-            Godot.Collections.Array row = (Godot.Collections.Array)grid[i];
-            for (int j = 0; j < 9; ++j)
-            {
-                int[] values;
-                Node cell = (Node)row[j];
-                int cell_value = (int)cell.Call("get_selected_id");
-                if (cell_value == 0)
-                {
-                    values = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-                }
-                else
-                {
-                    values = new int[] { cell_value };
-                }
-                HashSet<object> hashSet = new HashSet<object>();
-                foreach (int n in values)
-                {
-                    hashSet.Add(n);
-                }
-
-                variables[i, j] = new Variable(new Domain(hashSet));
-            }
-        }
-        return variables;
-    }
-    private Assignment createAssignment(Variable[,] variables)
-    {
-        Assignment assignment = new Assignment();
-        for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                List<object> list = new List<object>(variables[i, j].getDomain().getValues());
-                if (list.Count == 1)
-                    assignment.assign(variables[i, j], list[0]);
-            }
-        }
-        return assignment;
-    }
-
-    private List<Constraint> allDiff(List<Variable> variables)
-    {
-        List<Constraint> binaryConstraints = new List<Constraint>(36);
-        for (int i = 0; i < variables.Count ; i++)
-        {
-            for (int j = i+1; j < variables.Count; j++)
-            {
-                binaryConstraints.Add(new BinaryNotEquals(variables[i], variables[j]));
-            }
-        }
-        
-        return binaryConstraints;
     }
 }
