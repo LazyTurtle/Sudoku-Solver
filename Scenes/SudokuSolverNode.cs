@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SudokuSolver.CSP_Solver.Solver;
 using SudokuSolver.CSP_Solver;
 using SudokuSolver.CSP_Solver.Constraints;
+using System.Threading;
 
 public class SudokuSolverNode : Node
 {
@@ -92,15 +93,15 @@ public class SudokuSolverNode : Node
 
         ConstraintSatisfactionProblem<int> csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
 
-        Solver.SolutionFound += SolutionFoundHandler;
-        Solver.NoSolutionFound += NoSolutionFoundHandler;
-        
-        Assignment<int> solution = Solver.Solve(csp, initial_assignment);
+        System.Threading.Thread thread = new System.Threading.Thread(() => StartSolvingSudoku(csp, initial_assignment));
 
-        if (solution != null)
-        {
-            displayResults(solution);
-        }
+        thread.Start();
+    }
+
+    private void StartSolvingSudoku(ConstraintSatisfactionProblem<int> csp, Assignment<int> initial_assignment)
+    {
+        Solver.SolutionSearchCompleate += SearchCompleteEventHandler;
+        Solver.Solve(csp, initial_assignment);
     }
 
     private Variable<int>[,] CreateVariablesInt(Godot.Collections.Array grid)
@@ -230,16 +231,18 @@ public class SudokuSolverNode : Node
         return mapping;
     }
 
-    private void SolutionFoundHandler(object source, EventArgs eventArgs)
+    private void SearchCompleteEventHandler<Tval>(object source, SolutionSearchCompleateEventArgs<Tval> eventArgs)
     {
-        GD.Print("Solution found!");
-        isSolving = false;
-    }
+        if (eventArgs.SolutionFound)
+        {
+            displayResults(eventArgs.Solution);
+            GD.Print("Solution Found!");
+        }
+        else
+        {
+            GD.Print("No solution found");
+        }
 
-    private void NoSolutionFoundHandler(object source, EventArgs eventArgs)
-    {
-        GD.Print("No solution found!");
-        isSolving = false;
     }
     private void displayResults<Tval>(Assignment<Tval> solution)
     {

@@ -6,29 +6,36 @@ using System.Threading.Tasks;
 
 namespace SudokuSolver.CSP_Solver.Solver
 {
+    public class SolutionSearchCompleateEventArgs<Tval> : EventArgs
+    {
+        public bool SolutionFound { set; get; }
+        public Assignment<Tval> Solution { set; get; }
+    }
     public abstract class Solver<Tval>
     {
-        public delegate void SolutionFoundEventHandler(object source, EventArgs eventArgs);
-        public delegate void NoSolutionFoundEventHandler(object source, EventArgs eventArgs);
+        public delegate void SolutionSearchCompleateEventHandler(object source, SolutionSearchCompleateEventArgs<Tval> eventArgs);
 
-        public event SolutionFoundEventHandler SolutionFound;
-        public event NoSolutionFoundEventHandler NoSolutionFound;
+        public event SolutionSearchCompleateEventHandler SolutionSearchCompleate;
         public abstract Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null);
 
         protected virtual void OnSolutionFound(Assignment<Tval> solution)
         {
-            SolutionFound(this, EventArgs.Empty);
+            SolutionSearchCompleateEventArgs<Tval> args = new SolutionSearchCompleateEventArgs<Tval>();
+            args.Solution = solution;
+            args.SolutionFound = true;
+            SolutionSearchCompleate(this, args);
         }
 
         protected virtual void OnNoSolutionFound()
         {
-            NoSolutionFound(this, EventArgs.Empty);
+            SolutionSearchCompleateEventArgs<Tval> args = new SolutionSearchCompleateEventArgs<Tval>();
+            args.SolutionFound = false;
+            SolutionSearchCompleate(this, args);
         }
 
-        internal void ClearEvents()
+        public void ClearEvents()
         {
-            SolutionFound = null;
-            NoSolutionFound = null;
+            SolutionSearchCompleate = null;
         }
     }
 }
