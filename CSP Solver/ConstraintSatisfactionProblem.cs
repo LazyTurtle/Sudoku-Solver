@@ -14,6 +14,7 @@ namespace SudokuSolver.CSP_Solver
         private ImmutableArray<Constraint<Tval>> Constraints;
         private ImmutableDictionary<Variable<Tval>, List<Variable<Tval>>> NeighboursTable;
         private List<Tuple<Variable<Tval>, Variable<Tval>>> arcs;
+        private ImmutableDictionary<Variable<Tval>,List<Tuple<Variable<Tval>,Variable<Tval>>>> VariableArcsTable;
 
         public ConstraintSatisfactionProblem(IEnumerable<Variable<Tval>> variables, IEnumerable<Constraint<Tval>> constraints = null)
         {
@@ -26,6 +27,26 @@ namespace SudokuSolver.CSP_Solver
             Console.WriteLine("NeighboursTable: " + NeighboursTable.Count());
             arcs = CreateListOfArcs();
             Console.WriteLine("Arcs: " + arcs.Count());
+            VariableArcsTable = createVariableArcsTable(NeighboursTable).ToImmutableDictionary();
+        }
+
+        private Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>> createVariableArcsTable(ImmutableDictionary<Variable<Tval>, List<Variable<Tval>>> neighboursTable)
+        {
+            Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>> table = new Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>>(Variables.Length);
+            foreach (Variable<Tval> variable in Variables)
+            {
+                if(neighboursTable.TryGetValue(variable, out var neighbours))
+                {
+                    List<Tuple<Variable<Tval>, Variable<Tval>>> list = new List<Tuple<Variable<Tval>, Variable<Tval>>>();
+                    foreach (var neighbour in neighbours)
+                    {
+                        list.Add(new Tuple<Variable<Tval>, Variable<Tval>>(variable, neighbour));
+                    }
+                    table.Add(variable, list);
+                }
+            }
+
+            return table;
         }
 
         // This is only used for binary constraints
@@ -82,7 +103,7 @@ namespace SudokuSolver.CSP_Solver
             return Constraints;
         }
 
-        public List<Variable<Tval>> GetArcsOf(Variable<Tval> variable)
+        public List<Variable<Tval>> GetNeighboursOf(Variable<Tval> variable)
         {
             List<Variable<Tval>> list;
             NeighboursTable.TryGetValue(variable, out list);
@@ -92,6 +113,14 @@ namespace SudokuSolver.CSP_Solver
         public List<Tuple<Variable<Tval>, Variable<Tval>>> GetArcs()
         {
             return arcs;
+        }
+        public IEnumerable<Tuple<Variable<Tval>, Variable<Tval>>> GetArcsOf(Variable<Tval> variable)
+        {
+            if(VariableArcsTable.TryGetValue(variable, out var list))
+            {
+                return list;
+            }
+            return null;
         }
     }
 }

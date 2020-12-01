@@ -11,7 +11,32 @@ namespace SudokuSolver.CSP_Solver.Strategies
     {
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value)
         {
-            return Infer(csp);
+            InferenceResults<Tval> results = new InferenceResults<Tval>();
+
+            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsOf(variable));
+
+            while (queueOfArcs.Count > 0)
+            {
+                Tuple<Variable<Tval>, Variable<Tval>> arc = queueOfArcs.Dequeue();
+
+                Variable<Tval> X = arc.Item1, Y = arc.Item2;
+                if (Revise(csp, X, Y, results))
+                {
+                    //Console.WriteLine("------------------------------Revised: " + X.ToString());
+                    if (X.GetDomain().Size() == 0)
+                    {
+                        results.InconsistencyFound();
+                        return results;
+                    }
+                    foreach (Variable<Tval> neighbour in csp.GetNeighboursOf(X))
+                    {
+                        queueOfArcs.Enqueue(new Tuple<Variable<Tval>, Variable<Tval>>(neighbour, X));
+                    }
+                }
+                //Console.WriteLine("-----------Queue size: " + queueOfArcs.Count);
+            }
+
+            return results;
         }
 
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp)
@@ -27,17 +52,18 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 Variable<Tval> X = arc.Item1, Y = arc.Item2;
                 if (Revise(csp, X, Y, results))
                 {
-                    //Console.WriteLine("Revised: " + X.ToString());
+                    //Console.WriteLine("------------------------------Revised: " + X.ToString());
                     if (X.GetDomain().Size() == 0)
                     {
                         results.InconsistencyFound();
                         return results;
                     }
-                    foreach (Variable<Tval> neighbour in csp.GetArcsOf(X))
+                    foreach (Variable<Tval> neighbour in csp.GetNeighboursOf(X))
                     {
                         queueOfArcs.Enqueue(new Tuple<Variable<Tval>, Variable<Tval>>(neighbour, X));
                     }
                 }
+                //Console.WriteLine("-----------Queue size: " + queueOfArcs.Count);
             }
 
             return results;
@@ -57,7 +83,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 foreach (Tval valueY in variableY.GetDomain().GetValues())
                 {
                     assignment.Assign(variableY, valueY);
-                    // TODO: remove this consistent call, is one of the major bottleneck of the program
+                    // TODO: remove this isconsistent call, is one of the major bottleneck of the program
                     if (assignment.IsConsistent(csp.GetConstraints()))
                     {
                         satisfiable = true;
