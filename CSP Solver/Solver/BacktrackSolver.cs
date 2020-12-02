@@ -45,7 +45,11 @@ namespace SudokuSolver.CSP_Solver.Solver
 
             if (preliminaryResults.IsAssignmentConsistent())
             {
-                Assignment<Tval> solution = Backtrack(csp, initialAssignment);
+                foreach (Variable<Tval> variable in csp.GetVariables())
+                {
+                    GD.Print(variable.ToString());
+                }
+                Assignment<Tval> solution = null;// Backtrack(csp, initialAssignment);
 
                 if (solution != null)
                 {

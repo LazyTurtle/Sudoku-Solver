@@ -37,7 +37,7 @@ public class SudokuSolverNode : Node
         });
         */
         
-        
+        /*
         List<int>test= new List<int>(new int[] {
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -49,9 +49,9 @@ public class SudokuSolverNode : Node
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         });
-        
+        */
 
-        /*
+        
         List<int>test= new List<int>(new int[] {
         1, 2, 0, 0, 5, 6, 0, 8, 9,
         4, 5, 0, 7, 0, 9, 1, 0, 3,
@@ -63,7 +63,7 @@ public class SudokuSolverNode : Node
         6, 7, 0, 0, 1, 2, 3, 0, 5,
         0, 1, 2, 3, 4, 5, 6, 7, 8,
         });
-        */
+        
         
         int i = 0;
         foreach(Godot.Collections.Array row in grid)
