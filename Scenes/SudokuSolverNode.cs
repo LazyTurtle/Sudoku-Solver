@@ -81,8 +81,7 @@ public class SudokuSolverNode : Node
         
         if (isSolving)
             return;
-        isSolving = true;
-        Solver.ClearEvents();
+        DisableUserInput();
 
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
         Variable<int>[,] variables = CreateVariablesInt(grid);
@@ -112,6 +111,34 @@ public class SudokuSolverNode : Node
         System.Threading.Thread thread = new System.Threading.Thread(() => StartSolvingSudoku(csp, initial_assignment));
 
         thread.Start();
+    }
+
+    private void DisableUserInput()
+    {
+        isSolving = true;
+        Solver.ClearEvents();
+        Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
+        foreach (Godot.Collections.Array row in grid)
+        {
+            foreach (Node cell in row)
+            {
+                cell.CallDeferred("set_disabled", true);
+            }
+        }
+    }
+
+    private void EnableUserInput()
+    {
+        Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
+        foreach (Godot.Collections.Array row in grid)
+        {
+            foreach (Node cell in row)
+            {
+                cell.CallDeferred("set_disabled", false);
+            }
+        }
+        isSolving = false;
+
     }
 
     private void StartSolvingSudoku(ConstraintSatisfactionProblem<int> csp, Assignment<int> initial_assignment)
@@ -276,7 +303,7 @@ public class SudokuSolverNode : Node
         {
             GD.Print("No solution found");
         }
-        isSolving = false;
+        EnableUserInput();
     }
     private void DisplayResults<Tval>(Assignment<Tval> solution)
     {
