@@ -71,17 +71,22 @@ namespace SudokuSolver.CSP_Solver.Solver
             {
                 assignment.Assign(variable, value);
                 OnVariableAssigned(variable, value);
+
                 InferenceResults<Tval> inference = new InferenceResults<Tval>();
+                inference.StoreDomainForVariable(variable,variable.GetDomain());
+                variable.UpdateDomain(new Domain<Tval>(value));
+
                 if (assignment.IsConsistent(csp.GetConstraints()))
                 {
-                    inference = inferenceStrategy.Infer(csp, variable, value);
-                    if (true)
+                    inference = inferenceStrategy.Infer(csp, null, value, inference);
+                    if (inference.IsAssignmentConsistent())
                     {
                         Assignment<Tval> result = Backtrack(csp, assignment);
                         if (result != null)
                             return result;
                     }
                 }
+
                 assignment.RemoveAssignment(variable);
                 inference.RestoreOldDomains();
                 OnAssignmentRemoved(variable);

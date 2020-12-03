@@ -20,6 +20,11 @@ namespace SudokuSolver.CSP_Solver
             Values = new HashSet<Tval>(domain.Values);
         }
 
+        public Domain(params Tval [] values)
+        {
+            Values = new HashSet<Tval>(values);
+        }
+
         public HashSet<Tval> GetValues()
         {
             return Values;

@@ -9,21 +9,21 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     public class AC3<Tval> : InferenceStrategy<Tval>
     {
-        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value)
-        {
-            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsOf(variable));
-            return ReduceDomains(csp, queueOfArcs);
-        }
-
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp)
         {
             Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
             return ReduceDomains(csp, queueOfArcs);
         }
 
-        private InferenceResults<Tval> ReduceDomains(ConstraintSatisfactionProblem<Tval> csp, Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs)
+        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value, InferenceResults<Tval> inference = null)
         {
-            InferenceResults<Tval> results = new InferenceResults<Tval>();
+            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = (variable != null) ? new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsOf(variable)) : new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
+            return ReduceDomains(csp, queueOfArcs, inference);
+        }
+
+        private InferenceResults<Tval> ReduceDomains(ConstraintSatisfactionProblem<Tval> csp, Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs, InferenceResults<Tval> inference = null)
+        {
+            InferenceResults<Tval> results = inference ?? new InferenceResults<Tval>();
             while (queueOfArcs.Count > 0)
             {
                 Tuple<Variable<Tval>, Variable<Tval>> arc = queueOfArcs.Dequeue();
