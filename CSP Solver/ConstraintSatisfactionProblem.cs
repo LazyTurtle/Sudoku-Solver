@@ -54,28 +54,17 @@ namespace SudokuSolver.CSP_Solver
         {
             Dictionary<Variable<Tval>, List<Variable<Tval>>> neighbours = new Dictionary<Variable<Tval>, List<Variable<Tval>>>(Variables.Length);
 
-            List<Variable<Tval>> neighbourList;
-
             foreach (Constraint<Tval> constraint in constraints)
             {
                 if(constraint is BinaryConstraint<Tval>)
                 {
-                    if (neighbours.TryGetValue(constraint.ElementAt(0), out neighbourList))
+                    if (neighbours.TryGetValue(constraint.ElementAt(0), out List<Variable<Tval>> neighbourList))
                     {
                         neighbourList.Add(constraint.ElementAt(1));
                     }
                     else
                     {
                         neighbours.Add(constraint.ElementAt(0), new List<Variable<Tval>>() { constraint.ElementAt(1) });
-                    }
-
-                    if (neighbours.TryGetValue(constraint.ElementAt(1), out neighbourList))
-                    {
-                        neighbourList.Add(constraint.ElementAt(0));
-                    }
-                    else
-                    {
-                        neighbours.Add(constraint.ElementAt(1), new List<Variable<Tval>>() { constraint.ElementAt(0) });
                     }
                 }
             }

@@ -22,7 +22,20 @@ public class SudokuSolverNode : Node
     private void loadTest(Node sudokuGrid)
     {
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
-        
+
+        /*
+        List<int>test= new List<int>(new int[] {
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        });
+        */
         /*
         List<int>test= new List<int>(new int[] {
         1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -37,21 +50,6 @@ public class SudokuSolverNode : Node
         });
         */
         
-        /*
-        List<int>test= new List<int>(new int[] {
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        });
-        */
-
-        
         List<int>test= new List<int>(new int[] {
         1, 2, 0, 0, 5, 6, 0, 8, 9,
         4, 5, 0, 7, 0, 9, 1, 0, 3,
@@ -64,7 +62,20 @@ public class SudokuSolverNode : Node
         0, 1, 2, 3, 4, 5, 6, 7, 8,
         });
         
-        
+        /*
+        List<int>test= new List<int>(new int[] {
+        8, 2, 0, 0, 1, 0, 0, 0, 3,
+        0, 0, 0, 0, 0, 4, 7, 0, 5,
+        0, 9, 0, 0, 0, 0, 0, 0, 0,
+        0, 8, 0, 0, 5, 0, 0, 0, 0,
+        5, 0, 0, 3, 0, 2, 0, 0, 1,
+        0, 0, 0, 0, 8, 0, 0, 6, 0,
+        0, 0, 0, 0, 0, 0, 0, 3, 0,
+        2, 0, 1, 4, 0, 0, 0, 0, 0,
+        6, 0, 0, 0, 2, 0, 0, 5, 9,
+        });
+        */
+
         int i = 0;
         foreach(Godot.Collections.Array row in grid)
         {
@@ -257,6 +268,7 @@ public class SudokuSolverNode : Node
             for (int j = i + 1; j < variables.Count; j++)
             {
                 binaryConstraints.Add(new NotEquals<Tval>(variables[i], variables[j]));
+                binaryConstraints.Add(new NotEquals<Tval>(variables[j], variables[i]));
             }
         }
 
