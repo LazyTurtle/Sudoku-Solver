@@ -23,7 +23,7 @@ public class SudokuSolverNode : Node
     {
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 
-        /*
+        
         List<int>test= new List<int>(new int[] {
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -35,7 +35,7 @@ public class SudokuSolverNode : Node
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         });
-        */
+        
         /*
         List<int>test= new List<int>(new int[] {
         1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -49,7 +49,7 @@ public class SudokuSolverNode : Node
         9, 1, 2, 3, 4, 5, 6, 7, 8,
         });
         */
-        
+        /*
         List<int>test= new List<int>(new int[] {
         1, 2, 0, 0, 5, 6, 0, 8, 9,
         4, 5, 0, 7, 0, 9, 1, 0, 3,
@@ -61,7 +61,7 @@ public class SudokuSolverNode : Node
         6, 7, 0, 0, 1, 2, 3, 0, 5,
         0, 1, 2, 3, 4, 5, 6, 7, 8,
         });
-        
+        */
         /*
         List<int>test= new List<int>(new int[] {
         8, 2, 0, 0, 1, 0, 0, 0, 3,
@@ -224,7 +224,6 @@ public class SudokuSolverNode : Node
     private List<Constraint<Tval>> CreateConstraints<Tval>(Variable<Tval>[,] v)
     {
         List<Constraint<Tval>> constraints = new List<Constraint<Tval>>();
-
         // set all constraint for the rows
         for (int i = 0; i < 9; i++)
         {
@@ -235,7 +234,6 @@ public class SudokuSolverNode : Node
             }
             constraints.AddRange(AllDiff(row));
         }
-
         // set all constraint for the columns
 
         for (int i = 0; i < 9; i++)
@@ -247,16 +245,14 @@ public class SudokuSolverNode : Node
             }
             constraints.AddRange(AllDiff(column));
         }
-
         // set all constraint for the sub-squares
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
                 constraints.AddRange(AllDiff(VariablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
             }
         }
-
         return constraints;
     }
 
