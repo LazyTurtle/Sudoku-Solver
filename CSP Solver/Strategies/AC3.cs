@@ -17,24 +17,25 @@ namespace SudokuSolver.CSP_Solver.Strategies
 
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value, InferenceResults<Tval> inference = null)
         {
-            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = (variable != null) ? new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsOf(variable)) : new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
+            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = (variable != null) ? new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsTowards(variable)) : new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
             return ReduceDomains(csp, queueOfArcs, inference);
         }
 
         private InferenceResults<Tval> ReduceDomains(ConstraintSatisfactionProblem<Tval> csp, Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs, InferenceResults<Tval> inference = null)
         {
-            InferenceResults<Tval> results = inference ?? new InferenceResults<Tval>();
+            inference = inference ?? new InferenceResults<Tval>();
             while (queueOfArcs.Count > 0)
             {
                 Tuple<Variable<Tval>, Variable<Tval>> arc = queueOfArcs.Dequeue();
 
                 Variable<Tval> X = arc.Item1, Y = arc.Item2;
-                if (Revise(csp, X, Y, results))
+                if (Revise(csp, X, Y, inference))
                 {
                     if (X.GetDomain().Size() == 0)
                     {
-                        results.InconsistencyFound();
-                        return results;
+                        Console.WriteLine("EMPTY DOMAIN: "+X.ToString());
+                        inference.InconsistencyFound();
+                        return inference;
                     }
                     foreach (Variable<Tval> neighbour in csp.GetNeighboursOf(X))
                     {
@@ -43,10 +44,10 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 }
             }
 
-            return results;
+            return inference;
         }
 
-        private bool Revise(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variableX, Variable<Tval> variableY, InferenceResults<Tval> results)
+        private bool Revise(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variableX, Variable<Tval> variableY, InferenceResults<Tval> inference)
         {
             bool revised = false;
             Assignment<Tval> assignment = new Assignment<Tval>();
@@ -69,11 +70,12 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 if (!satisfiable)
                 {
                     variableX.GetDomain().RemoveValue(valueX);
+                    //Console.WriteLine("Removed "+valueX+" from "+variableX.ToString()+" because of "+variableY.ToString());
                     revised = true;
                 }
             }
             if (revised)
-                results.StoreDomainForVariable(variableX, oldDomain);
+                inference.StoreDomainForVariable(variableX, oldDomain);
 
             return revised;
         }

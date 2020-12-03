@@ -27,10 +27,10 @@ namespace SudokuSolver.CSP_Solver
             Console.WriteLine("NeighboursTable: " + NeighboursTable.Count());
             arcs = CreateListOfArcs();
             Console.WriteLine("Arcs: " + arcs.Count());
-            VariableArcsTable = createVariableArcsTable(NeighboursTable).ToImmutableDictionary();
+            VariableArcsTable = CreateVariableArcsTable(NeighboursTable).ToImmutableDictionary();
         }
 
-        private Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>> createVariableArcsTable(ImmutableDictionary<Variable<Tval>, List<Variable<Tval>>> neighboursTable)
+        private Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>> CreateVariableArcsTable(ImmutableDictionary<Variable<Tval>, List<Variable<Tval>>> neighboursTable)
         {
             Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>> table = new Dictionary<Variable<Tval>, List<Tuple<Variable<Tval>, Variable<Tval>>>>(Variables.Length);
             foreach (Variable<Tval> variable in Variables)
@@ -40,7 +40,7 @@ namespace SudokuSolver.CSP_Solver
                     List<Tuple<Variable<Tval>, Variable<Tval>>> list = new List<Tuple<Variable<Tval>, Variable<Tval>>>();
                     foreach (var neighbour in neighbours)
                     {
-                        list.Add(new Tuple<Variable<Tval>, Variable<Tval>>(variable, neighbour));
+                        list.Add(new Tuple<Variable<Tval>, Variable<Tval>>(neighbour, variable));
                     }
                     table.Add(variable, list);
                 }
@@ -103,7 +103,7 @@ namespace SudokuSolver.CSP_Solver
         {
             return arcs;
         }
-        public IEnumerable<Tuple<Variable<Tval>, Variable<Tval>>> GetArcsOf(Variable<Tval> variable)
+        public IEnumerable<Tuple<Variable<Tval>, Variable<Tval>>> GetArcsTowards(Variable<Tval> variable)
         {
             if(VariableArcsTable.TryGetValue(variable, out var list))
             {

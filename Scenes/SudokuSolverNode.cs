@@ -23,7 +23,7 @@ public class SudokuSolverNode : Node
     {
         Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 
-        
+        /*
         List<int>test= new List<int>(new int[] {
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -35,7 +35,7 @@ public class SudokuSolverNode : Node
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         });
-        
+        */
         /*
         List<int>test= new List<int>(new int[] {
         1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -75,6 +75,19 @@ public class SudokuSolverNode : Node
         6, 0, 0, 0, 2, 0, 0, 5, 9,
         });
         */
+        
+        List<int>test= new List<int>(new int[] {
+        0, 2, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 6, 0, 0, 0, 0, 3,
+        0, 7, 4, 0, 8, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 3, 0, 0, 2,
+        0, 8, 0, 0, 4, 0, 0, 1, 0,
+        6, 0, 0, 5, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 0, 7, 8, 0,
+        5, 0, 0, 0, 0, 9, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 4, 0,
+        });
+        
 
         int i = 0;
         foreach(Godot.Collections.Array row in grid)
