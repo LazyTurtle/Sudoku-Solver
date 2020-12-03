@@ -88,11 +88,7 @@ namespace SudokuSolver.CSP_Solver.Solver
 
                 assignment.RemoveAssignment(variable);
                 OnAssignmentRemoved(variable, value);
-                //Console.WriteLine("-------------");
-                //foreach (var v in csp.GetVariables()) Console.WriteLine("["+v.ToString());
                 inference.RestoreOldDomains();
-                //Console.WriteLine("-------------");
-                //foreach (var v in csp.GetVariables()) Console.WriteLine("{"+v.ToString());
             }
 
             return null;

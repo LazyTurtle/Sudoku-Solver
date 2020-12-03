@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SudokuSolver.CSP_Solver.Solver;
 using SudokuSolver.CSP_Solver;
 using SudokuSolver.CSP_Solver.Constraints;
+using System.Threading.Tasks;
 
 public class SudokuSolverNode : Node
 {
@@ -49,7 +50,7 @@ public class SudokuSolverNode : Node
         9, 1, 2, 3, 4, 5, 6, 7, 8,
         });
         */
-        /*
+        
         List<int>test= new List<int>(new int[] {
         1, 2, 0, 0, 5, 6, 0, 8, 9,
         4, 5, 0, 7, 0, 9, 1, 0, 3,
@@ -61,7 +62,7 @@ public class SudokuSolverNode : Node
         6, 7, 0, 0, 1, 2, 3, 0, 5,
         0, 1, 2, 3, 4, 5, 6, 7, 8,
         });
-        */
+        
         /*
         List<int>test= new List<int>(new int[] {
         8, 2, 0, 0, 1, 0, 0, 0, 3,
@@ -75,7 +76,7 @@ public class SudokuSolverNode : Node
         6, 0, 0, 0, 2, 0, 0, 5, 9,
         });
         */
-        
+        /*
         List<int>test= new List<int>(new int[] {
         0, 2, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 6, 0, 0, 0, 0, 3,
@@ -87,7 +88,7 @@ public class SudokuSolverNode : Node
         5, 0, 0, 0, 0, 9, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 4, 0,
         });
-        
+        */
 
         int i = 0;
         foreach(Godot.Collections.Array row in grid)
@@ -132,9 +133,11 @@ public class SudokuSolverNode : Node
 
         ConstraintSatisfactionProblem<int> csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
 
-        System.Threading.Thread thread = new System.Threading.Thread(() => StartSolvingSudoku(csp, initial_assignment));
+        Task.Factory.StartNew(() => { StartSolvingSudoku(csp, initial_assignment); });
 
-        thread.Start();
+        //System.Threading.Thread thread = new System.Threading.Thread(() => StartSolvingSudoku(csp, initial_assignment));
+
+        //thread.Start();
     }
 
     private void DisableUserInput()

@@ -27,7 +27,22 @@ namespace SudokuSolver.CSP_Solver
 
         public bool IsConsistent(IEnumerable<Constraint<Tval>> constraints)
         {
+            int constraintsPerSlot = constraints.Count() / 4;
+            List<Constraint<Tval>> list = constraints.ToList();
+
             return (constraints.Any(c => c.IsViolated(this))) ? false : true;
+        }
+
+        private bool ConsistencyInRange(List<Constraint<Tval>> constraints, int min, int max)
+        {
+            bool consistent = true;
+            for (int i = min; i < max; i++)
+            {
+                consistent = !constraints[i].IsViolated(this);
+                if (!consistent)
+                    break;
+            }
+            return consistent;
         }
 
         public void Assign(Variable<Tval> variable, Tval value)
