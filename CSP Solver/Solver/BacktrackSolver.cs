@@ -40,7 +40,6 @@ namespace SudokuSolver.CSP_Solver.Solver
         public override Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null)
         {
             initialAssignment = initialAssignment ?? new Assignment<Tval>();
-            
             InferenceResults<Tval> preliminaryResults= inferenceStrategy.Infer(csp);
 
             if (preliminaryResults.IsAssignmentConsistent())
@@ -49,7 +48,7 @@ namespace SudokuSolver.CSP_Solver.Solver
                 {
                     GD.Print(variable.ToString());
                 }
-                Assignment<Tval> solution = null;// Backtrack(csp, initialAssignment);
+                Assignment<Tval> solution = Backtrack(csp, initialAssignment);
 
                 if (solution != null)
                 {
