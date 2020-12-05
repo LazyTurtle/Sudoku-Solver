@@ -9,6 +9,7 @@ namespace SudokuSolver.CSP_Solver
     public class Assignment<Tval>
     {
         private Dictionary<Variable<Tval>, Tval> assignments;
+        private int numberOfTasks = 5;
 
         public Assignment(Dictionary<Variable<Tval>, Tval> initialAssignment = null)
         {
@@ -27,7 +28,42 @@ namespace SudokuSolver.CSP_Solver
 
         public bool IsConsistent(IEnumerable<Constraint<Tval>> constraints)
         {
-            return (constraints.Any(c => c.IsViolated(this))) ? false : true;
+            //return !constraints.Any(c => c.IsViolated(this));
+            int constraintsPerTask = (int)Math.Ceiling((constraints.Count() / (float)numberOfTasks));
+            List<Task<bool>> tasks = new List<Task<bool>>(numberOfTasks);
+            List<Constraint<Tval>> constraintList = constraints.ToList();
+            for (int i = 0; i < numberOfTasks; ++i)
+            {
+                // this local variable is necessary since the lambda expression
+                // is not syncronized with the for outside its scope
+                // without this the i inside the lambda body is a random value.
+                // there should be a different way to give lambda expression
+                // arguments but I only found funcs and actions
+                // which are unnecessarily convoluted and a pain to implement
+                int local = i;
+                tasks.Add(Task.Run(() =>
+                {
+                    return ConsistencyInRange(constraintList, local * constraintsPerTask, (local + 1) * constraintsPerTask);
+                }));
+            }
+            Task<bool[]> tasksResult = Task.WhenAll(tasks);
+            tasksResult.Wait();
+            return !tasksResult.Result.Any(r => r == false);
+            
+        }
+
+        private bool ConsistencyInRange(List<Constraint<Tval>> constraints, int min, int max)
+        {
+            bool consistent = true;
+            min = (min >= 0) ? min : 0;
+            max = (max < constraints.Count) ? max : constraints.Count;
+            for (int i = min; i < max; i++)
+            {
+                consistent = constraints[i].IsSatisfied(this);
+                if (!consistent)
+                    break;
+            }
+            return consistent;
         }
 
         public void Assign(Variable<Tval> variable, Tval value)

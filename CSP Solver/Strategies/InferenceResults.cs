@@ -22,7 +22,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
             if (domain == null) throw new ArgumentNullException("domain");
             if (storedDomains.ContainsKey(variable))
             {
-                storedDomains[variable] = domain;
+                storedDomains[variable].GetValues().UnionWith(domain.GetValues());
             }
             else
             {
@@ -47,5 +47,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
         {
             return isConsistent;
         }
+
     }
 }

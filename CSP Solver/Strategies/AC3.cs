@@ -9,67 +9,44 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     public class AC3<Tval> : InferenceStrategy<Tval>
     {
-        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value)
-        {
-            InferenceResults<Tval> results = new InferenceResults<Tval>();
-
-            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsOf(variable));
-
-            while (queueOfArcs.Count > 0)
-            {
-                Tuple<Variable<Tval>, Variable<Tval>> arc = queueOfArcs.Dequeue();
-
-                Variable<Tval> X = arc.Item1, Y = arc.Item2;
-                if (Revise(csp, X, Y, results))
-                {
-                    //Console.WriteLine("------------------------------Revised: " + X.ToString());
-                    if (X.GetDomain().Size() == 0)
-                    {
-                        results.InconsistencyFound();
-                        return results;
-                    }
-                    foreach (Variable<Tval> neighbour in csp.GetNeighboursOf(X))
-                    {
-                        queueOfArcs.Enqueue(new Tuple<Variable<Tval>, Variable<Tval>>(neighbour, X));
-                    }
-                }
-                //Console.WriteLine("-----------Queue size: " + queueOfArcs.Count);
-            }
-
-            return results;
-        }
-
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp)
         {
-            InferenceResults<Tval> results = new InferenceResults<Tval>();
-
             Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
+            return ReduceDomains(csp, queueOfArcs);
+        }
 
+        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value, InferenceResults<Tval> inference = null)
+        {
+            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = (variable != null) ? new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsTowards(variable)) : new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
+            return ReduceDomains(csp, queueOfArcs, inference);
+        }
+
+        private InferenceResults<Tval> ReduceDomains(ConstraintSatisfactionProblem<Tval> csp, Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs, InferenceResults<Tval> inference = null)
+        {
+            inference = inference ?? new InferenceResults<Tval>();
             while (queueOfArcs.Count > 0)
             {
                 Tuple<Variable<Tval>, Variable<Tval>> arc = queueOfArcs.Dequeue();
 
                 Variable<Tval> X = arc.Item1, Y = arc.Item2;
-                if (Revise(csp, X, Y, results))
+                if (Revise(csp, X, Y, inference))
                 {
-                    //Console.WriteLine("------------------------------Revised: " + X.ToString());
                     if (X.GetDomain().Size() == 0)
                     {
-                        results.InconsistencyFound();
-                        return results;
+                        inference.InconsistencyFound();
+                        return inference;
                     }
                     foreach (Variable<Tval> neighbour in csp.GetNeighboursOf(X))
                     {
                         queueOfArcs.Enqueue(new Tuple<Variable<Tval>, Variable<Tval>>(neighbour, X));
                     }
                 }
-                //Console.WriteLine("-----------Queue size: " + queueOfArcs.Count);
             }
 
-            return results;
+            return inference;
         }
 
-        private bool Revise(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variableX, Variable<Tval> variableY, InferenceResults<Tval> results)
+        private bool Revise(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variableX, Variable<Tval> variableY, InferenceResults<Tval> inference)
         {
             bool revised = false;
             Assignment<Tval> assignment = new Assignment<Tval>();
@@ -83,7 +60,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 foreach (Tval valueY in variableY.GetDomain().GetValues())
                 {
                     assignment.Assign(variableY, valueY);
-                    // TODO: remove this isconsistent call, is one of the major bottleneck of the program
                     if (assignment.IsConsistent(csp.GetConstraints()))
                     {
                         satisfiable = true;
@@ -97,7 +73,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 }
             }
             if (revised)
-                results.StoreDomainForVariable(variableX, oldDomain);
+                inference.StoreDomainForVariable(variableX, oldDomain);
 
             return revised;
         }
