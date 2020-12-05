@@ -33,7 +33,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 {
                     if (X.GetDomain().Size() == 0)
                     {
-                        Console.WriteLine("EMPTY DOMAIN: "+X.ToString());
                         inference.InconsistencyFound();
                         return inference;
                     }
@@ -70,7 +69,6 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 if (!satisfiable)
                 {
                     variableX.GetDomain().RemoveValue(valueX);
-                    //Console.WriteLine("Removed "+valueX+" from "+variableX.ToString()+" because of "+variableY.ToString());
                     revised = true;
                 }
             }

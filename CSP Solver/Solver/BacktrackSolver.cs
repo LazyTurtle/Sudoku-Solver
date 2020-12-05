@@ -44,10 +44,6 @@ namespace SudokuSolver.CSP_Solver.Solver
 
             if (preliminaryResults.IsAssignmentConsistent())
             {
-                foreach (Variable<Tval> variable in csp.GetVariables())
-                {
-                    GD.Print(variable.ToString());
-                }
                 Assignment<Tval> solution = Backtrack(csp, initialAssignment);
 
                 if (solution != null)
@@ -96,19 +92,20 @@ namespace SudokuSolver.CSP_Solver.Solver
 
         private void OnVariableAssigned(Variable<Tval> variable, Tval value)
         {
-            GD.Print("Variable assigned: " + variable.ToString());
-            GD.Print("Selected Value: " + value.ToString());
-            VariableAssignmentEventArgs<Tval> args = new VariableAssignmentEventArgs<Tval>();
-            args.Variable = variable;
-            args.AssignedValue = value;
+            VariableAssignmentEventArgs<Tval> args = new VariableAssignmentEventArgs<Tval>
+            {
+                Variable = variable,
+                AssignedValue = value
+            };
             VariableAssigned(this, args);
         }
 
         private void OnAssignmentRemoved(Variable<Tval> variable, Tval value)
         {
-            GD.Print("Variable removed: " + variable.ToString()+" - "+value);
-            VariableAssignmentEventArgs<Tval> args = new VariableAssignmentEventArgs<Tval>();
-            args.Variable = variable;
+            VariableAssignmentEventArgs<Tval> args = new VariableAssignmentEventArgs<Tval>
+            {
+                Variable = variable
+            };
             AssignmentRemoved(this, args);
         }
 
