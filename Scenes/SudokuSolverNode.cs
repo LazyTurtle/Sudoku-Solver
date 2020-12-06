@@ -13,15 +13,23 @@ public class SudokuSolverNode : Node
 	[Signal]
 	public delegate void FinishedSolving();
 
-	private Solver<int> Solver;
+	[Export]
+	private NodePath sudokuGridNodePath;
 	private Node sudokuGrid;
+
+	[Export]
+	private NodePath solveButtonNodePath;
+	private Button solveButton;
+
+	private Solver<int> Solver;
 	private bool isSolving = false;
 	private Dictionary<object, Node> relationVariablesSudoku;
 
 	public override void _Ready()
 	{
 		Solver = new BacktrackSolver<int>();
-		sudokuGrid = GetTree().Root.GetNode("MainScene/Interface/Center/VBox/Sudoku/SudokuGrid");
+		sudokuGrid = (sudokuGridNodePath != null) ? GetNode(sudokuGridNodePath) : GetTree().Root.GetNode("MainScene/Interface/Center/VBox/Sudoku/SudokuGrid");
+		solveButton = (Button)GetNode(solveButtonNodePath);
 		loadTest(sudokuGrid);
 	}
 
@@ -145,6 +153,9 @@ public class SudokuSolverNode : Node
 	private void DisableUserInput()
 	{
 		isSolving = true;
+		if (solveButton != null)
+			solveButton.CallDeferred("set_disabled", true);
+
 		Solver.ClearEvents();
 		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 		foreach (Godot.Collections.Array row in grid)
@@ -166,6 +177,8 @@ public class SudokuSolverNode : Node
 				cell.CallDeferred("set_disabled", false);
 			}
 		}
+		if (solveButton != null)
+			solveButton.CallDeferred("set_disabled", false);
 		isSolving = false;
 
 	}
