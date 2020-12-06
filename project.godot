@@ -22,7 +22,7 @@ _global_script_class_icons={
 
 config/name="Sudoku Solver"
 run/main_scene="res://Scenes/MainScene.tscn"
-config/icon="res://icon.png"
+config/icon="res://Assets/icon.png"
 
 [editor_plugins]
 
@@ -34,4 +34,4 @@ profiler/enabled=true
 
 [rendering]
 
-environment/default_environment="res://default_env.tres"
+environment/default_environment="res://Assets/default_env.tres"
