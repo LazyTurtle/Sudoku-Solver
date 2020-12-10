@@ -8,13 +8,13 @@
 [ext_resource path="res://Assets/UI/pixel theme/GUI.png" type="Texture" id=6]
 [ext_resource path="res://Assets/UI/pixel theme/theme items/panel container.tres" type="StyleBox" id=7]
 
-[sub_resource type="StyleBoxTexture" id=2]
+[sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 6 )
 region_rect = Rect2( 50, 34, 44, 12 )
 margin_left = 4.0
 margin_right = 4.0
 
-[sub_resource type="StyleBoxTexture" id=3]
+[sub_resource type="StyleBoxTexture" id=2]
 texture = ExtResource( 6 )
 region_rect = Rect2( 81, 97, 30, 30 )
 margin_left = 7.0
@@ -22,11 +22,11 @@ margin_right = 7.0
 margin_top = 7.0
 margin_bottom = 7.0
 
+[sub_resource type="ImageTexture" id=3]
+
 [sub_resource type="ImageTexture" id=4]
 
-[sub_resource type="ImageTexture" id=7]
-
-[sub_resource type="ImageTexture" id=8]
+[sub_resource type="ImageTexture" id=5]
 
 [sub_resource type="DynamicFont" id=6]
 font_data = ExtResource( 3 )
@@ -45,7 +45,7 @@ Button/styles/hover = ExtResource( 5 )
 Button/styles/normal = ExtResource( 4 )
 Button/styles/pressed = ExtResource( 5 )
 HSeparator/constants/separation = 10
-HSeparator/styles/separator = SubResource( 2 )
+HSeparator/styles/separator = SubResource( 1 )
 Label/colors/font_color = Color( 1, 1, 1, 1 )
 Label/colors/font_color_shadow = Color( 0, 0, 0, 0 )
 Label/colors/font_outline_modulate = Color( 1, 1, 1, 1 )
@@ -54,7 +54,7 @@ Label/constants/shadow_as_outline = 0
 Label/constants/shadow_offset_x = 1
 Label/constants/shadow_offset_y = 1
 Label/fonts/font = null
-Label/styles/normal = SubResource( 3 )
+Label/styles/normal = SubResource( 2 )
 OptionButton/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
 OptionButton/colors/font_color_disabled = Color( 0, 0, 0, 0.862745 )
 OptionButton/colors/font_color_hover = Color( 0.94, 0.94, 0.94, 1 )
@@ -62,7 +62,7 @@ OptionButton/colors/font_color_pressed = Color( 1, 1, 1, 1 )
 OptionButton/constants/arrow_margin = 0
 OptionButton/constants/hseparation = 2
 OptionButton/fonts/font = null
-OptionButton/icons/arrow = SubResource( 4 )
+OptionButton/icons/arrow = SubResource( 3 )
 OptionButton/styles/disabled = ExtResource( 2 )
 OptionButton/styles/focus = ExtResource( 1 )
 OptionButton/styles/hover = ExtResource( 2 )
@@ -77,8 +77,8 @@ PopupMenu/constants/hseparation = 4
 PopupMenu/constants/vseparation = 20
 PopupMenu/fonts/font = null
 PopupMenu/icons/checked = null
-PopupMenu/icons/radio_checked = SubResource( 7 )
-PopupMenu/icons/radio_unchecked = SubResource( 8 )
+PopupMenu/icons/radio_checked = SubResource( 4 )
+PopupMenu/icons/radio_unchecked = SubResource( 5 )
 PopupMenu/icons/submenu = null
 PopupMenu/icons/unchecked = null
 PopupMenu/styles/hover = null
