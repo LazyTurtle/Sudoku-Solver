@@ -18,6 +18,7 @@ func _process(delta):
 
 
 func _on_SudokuSolverNode_StartSolving():
+	time_passed = 0
 	counting = true;
 	pass # Replace with function body.
 

@@ -2,7 +2,7 @@ extends GridContainer
 
 class_name SudokuGrid
 
-const editable_cell = preload("res://2D Nodes/EditableCell.tscn")
+export(PackedScene) var editable_cell = preload("res://Scenes/2D Nodes/EditableCell.tscn")
 var cell_matrix : Array
 
 func _ready():
