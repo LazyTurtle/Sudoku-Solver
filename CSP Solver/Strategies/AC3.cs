@@ -17,7 +17,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
 
         public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value, InferenceResults<Tval> inference = null)
         {
-            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = (variable != null) ? new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcsTowards(variable)) : new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
+            Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>((variable != null) ? csp.GetArcsTowards(variable) : csp.GetArcs());
             return ReduceDomains(csp, queueOfArcs, inference);
         }
 
@@ -45,7 +45,10 @@ namespace SudokuSolver.CSP_Solver.Strategies
 
             return inference;
         }
-
+        // It might be possible to parallelize this method
+        // giving to each task a different value of X
+        // but I'm not sure if it's worth it or if it creates problem with
+        // the paralelized IsConsistent check.
         private bool Revise(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variableX, Variable<Tval> variableY, InferenceResults<Tval> inference)
         {
             bool revised = false;

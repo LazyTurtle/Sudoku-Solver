@@ -20,7 +20,7 @@ namespace SudokuSolver.CSP_Solver
         {
             if (variables == null) throw new ArgumentNullException("variables");
             Variables = ImmutableArray.Create(variables.ToArray());
-            Console.WriteLine("Variabili: "+Variables.Length);
+            Console.WriteLine("Variables: "+Variables.Length);
             Constraints = (constraints != null) ? ImmutableArray.Create(constraints.ToArray()) : ImmutableArray.Create<Constraint<Tval>>();
             Console.WriteLine("Constraints: " + Constraints.Length);
             NeighboursTable = CreateNeighboursArcs(Constraints).ToImmutableDictionary();
