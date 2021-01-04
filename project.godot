@@ -24,6 +24,11 @@ config/name="Sudoku Solver"
 run/main_scene="res://Scenes/Title Screen.tscn"
 config/icon="res://Assets/icon.png"
 
+[autoload]
+
+SceneLoader="*res://Scripts/Autoload/SceneLoader.gd"
+Settings="*res://Scripts/Autoload/Settings.gd"
+
 [display]
 
 window/size/width=1920
