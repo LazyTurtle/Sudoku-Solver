@@ -35,10 +35,3 @@ func export_grid_into_matrix():
 		for j in range(9):
 			matrix[i].append(cell_matrix[i][j].get_item_id())
 	return matrix
-
-
-
-
-
-
-

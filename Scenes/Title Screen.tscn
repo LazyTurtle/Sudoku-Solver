@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Assets/UI/Fonts/Menu font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://Assets/UI/pixel theme/pixel theme high resx4.tres" type="Theme" id=2]
 [ext_resource path="res://Scripts/MenuHandler.gd" type="Script" id=3]
 [ext_resource path="res://Assets/UI/Fonts/MinimalPixel v2.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://Scripts/BaseControl.gd" type="Script" id=5]
+[ext_resource path="res://Scenes/2D Nodes/ChangeSceneButton.tscn" type="PackedScene" id=7]
 
 [sub_resource type="DynamicFont" id=1]
 size = 64
@@ -51,12 +52,13 @@ margin_top = 95.0
 margin_right = 1810.0
 margin_bottom = 110.0
 
-[node name="ButtonSudokuSolvingScene" type="Button" parent="2D interface/MarginContainer/VBoxContainer"]
+[node name="SolveSudokuButton" parent="2D interface/MarginContainer/VBoxContainer" instance=ExtResource( 7 )]
 margin_top = 125.0
 margin_right = 1810.0
 margin_bottom = 181.0
 custom_fonts/font = ExtResource( 1 )
-text = "Solve a sudoku"
+text = "Solve a sudku"
+destination_scene = "res://Scenes/SolvingScene.tscn"
 
 [node name="ButtonCredits" type="Button" parent="2D interface/MarginContainer/VBoxContainer"]
 margin_top = 196.0
@@ -69,5 +71,4 @@ text = "Credits"
 
 [node name="MenuHandler" type="Node" parent="Tools"]
 script = ExtResource( 3 )
-[connection signal="pressed" from="2D interface/MarginContainer/VBoxContainer/ButtonSudokuSolvingScene" to="Tools/MenuHandler" method="_on_ButtonSudokuSolvingScene_pressed"]
 [connection signal="pressed" from="2D interface/MarginContainer/VBoxContainer/ButtonCredits" to="Tools/MenuHandler" method="_on_ButtonCredits_pressed"]

@@ -6,10 +6,10 @@ enum property {THEME}
 
 var settings := Dictionary()
 
-func _ready():
+func _enter_tree():
 	settings[property.THEME]=global_theme
 	pass
 
 func get_setting_property(setting:int):
-	assert(setting in property, "Only Settings.peoperty enum are allowed")
+	assert(setting in property.values(), "Only Settings.peoperty enum are allowed")
 	return settings[setting]
