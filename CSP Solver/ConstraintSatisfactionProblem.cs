@@ -16,6 +16,7 @@ namespace SudokuSolver.CSP_Solver
         private List<Tuple<Variable<Tval>, Variable<Tval>>> arcs;
         private ImmutableDictionary<Variable<Tval>,List<Tuple<Variable<Tval>,Variable<Tval>>>> VariableArcsTable;
 
+        public ConstraintSatisfactionProblem() { }
         public ConstraintSatisfactionProblem(IEnumerable<Variable<Tval>> variables, IEnumerable<Constraint<Tval>> constraints = null)
         {
             if (variables == null) throw new ArgumentNullException("variables");

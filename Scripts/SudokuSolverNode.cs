@@ -25,6 +25,9 @@ public class SudokuSolverNode : Node
 	private bool isSolving = false;
 	private Dictionary<object, Node> relationVariablesSudoku;
 
+	private ConstraintSatisfactionProblem<int> csp;
+	Assignment<int> initial_assignment;
+
 	public override void _Ready()
 	{
 		Solver = new BacktrackSolver<int>();
@@ -33,12 +36,18 @@ public class SudokuSolverNode : Node
 			sudokuGrid.Connect("cell_value_changed", this, nameof(OnCellValueChanged));
 		solveButton = (Button)GetNode(solveButtonNodePath);
 		loadTest(sudokuGrid);
+		Task.Factory.StartNew(() => { SetupSudokuData(); });
 	}
+
+    private void SetupSudokuData()
+    {
+        throw new NotImplementedException();
+    }
 
     private void OnCellValueChanged(int index, int row, int column)
     {
-		//throw new NotImplementedException();
-		GD.Print(index, row, column);
+		throw new NotImplementedException();
+		//csp.UpdateVariable();
     }
 
     private void loadTest(Node sudokuGrid)
