@@ -10,6 +10,10 @@ __meta__ = {
 }
 
 [node name="SudokuGrid" type="GridContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 7.0
+margin_bottom = 7.0
 size_flags_horizontal = 7
 size_flags_vertical = 7
 custom_constants/vseparation = 10

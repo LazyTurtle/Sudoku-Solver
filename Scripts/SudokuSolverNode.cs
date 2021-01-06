@@ -29,11 +29,19 @@ public class SudokuSolverNode : Node
 	{
 		Solver = new BacktrackSolver<int>();
 		sudokuGrid = (sudokuGridNodePath != null) ? GetNode(sudokuGridNodePath) : GetTree().Root.GetNode("MainScene/Interface/Center/VBox/Sudoku/SudokuGrid");
+		if (sudokuGrid != null)
+			sudokuGrid.Connect("cell_value_changed", this, nameof(OnCellValueChanged));
 		solveButton = (Button)GetNode(solveButtonNodePath);
 		loadTest(sudokuGrid);
 	}
 
-	private void loadTest(Node sudokuGrid)
+    private void OnCellValueChanged(int index, int row, int column)
+    {
+		//throw new NotImplementedException();
+		GD.Print(index, row, column);
+    }
+
+    private void loadTest(Node sudokuGrid)
 	{
 		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 
