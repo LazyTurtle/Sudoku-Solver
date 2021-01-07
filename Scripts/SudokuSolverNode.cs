@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using SudokuSolver.CSP_Solver.Solver;
 using SudokuSolver.CSP_Solver;
@@ -41,16 +42,46 @@ public class SudokuSolverNode : Node
 
     private void SetupSudokuData()
     {
-        throw new NotImplementedException();
+		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
+		Variable<int>[,] variables = CreateVariablesInt(grid);
+		GD.Print("variables created");
+
+		initial_assignment = CreateAssignment(variables);
+		GD.Print("assignment created");
+
+		List<Constraint<int>> constraints = CreateConstraints(variables);
+		GD.Print("constraints created");
+
+		relationVariablesSudoku = CreateMappingVariablesNodes(variables);
+		GD.Print("mapping created");
+
+
+		List<Variable<int>> variable_list = new List<Variable<int>>(9 * 9);
+		for (int i = 0; i < 9; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				variable_list.Add(variables[i, j]);
+			}
+		}
+
+		csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
     }
 
-    private void OnCellValueChanged(int index, int row, int column)
+    private void OnCellValueChanged(int value, int row, int column)
     {
-		throw new NotImplementedException();
-		//csp.UpdateVariable();
-    }
+		Task.Factory.StartNew(() => { TaskOnCellValueChanged(value, row, column); });
+	}
 
-    private void loadTest(Node sudokuGrid)
+	private void TaskOnCellValueChanged(int value, int row, int column)
+    {
+		Variable<int> variable = csp.GetVariables().ElementAt(9 * row + column);
+		initial_assignment.Assign(variable, value);
+		Solver.CheckAssignment(csp, initial_assignment);
+	}
+
+
+	private void loadTest(Node sudokuGrid)
 	{
 		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 
@@ -133,36 +164,10 @@ public class SudokuSolverNode : Node
 
 	public void OnButtonPressed()
 	{
-		
 		if (isSolving)
 			return;
+
 		EmitSignal(nameof(StartSolving));
-		DisableUserInput();
-
-		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
-		Variable<int>[,] variables = CreateVariablesInt(grid);
-		GD.Print("variables created");
-
-		Assignment<int> initial_assignment = CreateAssignment(variables);
-		GD.Print("assignment created");
-
-		List<Constraint<int>> constraints = CreateConstraints(variables);
-		GD.Print("constraints created");
-
-		relationVariablesSudoku = CreateMappingVariablesNodes(variables);
-		GD.Print("mapping created");
-
-
-		List<Variable<int>> variable_list = new List<Variable<int>>(9 * 9);
-		for (int i = 0; i < 9; i++)
-		{
-			for (int j = 0; j < 9; j++)
-			{
-				variable_list.Add(variables[i, j]);
-			}
-		}
-
-		ConstraintSatisfactionProblem<int> csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
 
 		Task.Factory.StartNew(() => { StartSolvingSudoku(csp, initial_assignment); });
 	}
@@ -202,6 +207,7 @@ public class SudokuSolverNode : Node
 
 	private void StartSolvingSudoku(ConstraintSatisfactionProblem<int> csp, Assignment<int> initial_assignment)
 	{
+		DisableUserInput();
 		Solver.SolutionSearchCompleate += SearchCompleteEventHandler;
 		((BacktrackSolver<int>)Solver).VariableAssigned += OnVariableAssignedEventHandler;
 		((BacktrackSolver<int>)Solver).AssignmentRemoved += OnAssignmentRemoved;

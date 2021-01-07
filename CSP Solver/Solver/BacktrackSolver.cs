@@ -34,7 +34,6 @@ namespace SudokuSolver.CSP_Solver.Solver
             inferenceStrategy = infs ?? new AC3<Tval>();
             variableSelectionStrategy = vss ?? new MinimumRemainingValues<Tval>();
             domainValueSelectionStragety = dvss ?? new UnorderedDomainValues<Tval>();
-
         }
 
         public override Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null)
@@ -116,5 +115,9 @@ namespace SudokuSolver.CSP_Solver.Solver
             AssignmentRemoved = null;
         }
 
+        public override void CheckAssignment(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initial_assignment)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
