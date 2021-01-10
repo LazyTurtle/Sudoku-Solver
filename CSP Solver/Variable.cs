@@ -30,7 +30,7 @@ namespace SudokuSolver.CSP_Solver
 
         public override string ToString()
         {
-            return Name + " " + Domain.ToString();
+            return (Name ?? "No Name") + " " + Domain.ToString();
         }
     }
 }

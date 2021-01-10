@@ -23,7 +23,8 @@ __meta__ = {
 }
 
 [node name="MarginContainer" type="MarginContainer" parent="2D interface"]
-anchor_right = 1.0
+anchor_left = -0.000695229
+anchor_right = 0.999305
 anchor_bottom = 1.0
 custom_constants/margin_right = 50
 custom_constants/margin_top = 60
