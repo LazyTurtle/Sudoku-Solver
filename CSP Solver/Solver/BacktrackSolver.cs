@@ -39,7 +39,7 @@ namespace SudokuSolver.CSP_Solver.Solver
         public override Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null)
         {
             initialAssignment = initialAssignment ?? new Assignment<Tval>();
-            InferenceResults<Tval> preliminaryResults= inferenceStrategy.Infer(csp);
+            InferenceResults<Tval> preliminaryResults = inferenceStrategy.Infer(csp);
 
             if (preliminaryResults.IsAssignmentConsistent())
             {
@@ -115,9 +115,30 @@ namespace SudokuSolver.CSP_Solver.Solver
             AssignmentRemoved = null;
         }
 
-        public override void CheckAssignment(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initial_assignment)
+        // We assume that, if the variable has already been assigned,
+        // the old value of the variable has been removed
+        // by an inference at a previous step, and therefore it is not
+        // present in the domain of its neighbours, but since we might
+        // have another variable that has the same value in its neighbour
+        // (the assignment was not consistent) there is going to be another
+        // inference to rule out inconsistent domains.
+        public override InferenceResults<Tval> UpdateVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Tval value)
         {
-            throw new NotImplementedException();
+
+            if (assignment.HasBeenAssigned(variable))
+            {
+                Tval oldValue = assignment.ValueOf(variable);
+                assignment.RemoveAssignment(variable);
+                List<Variable<Tval>> neighbours = csp.GetNeighboursOf(variable);
+                foreach(Variable<Tval> v in neighbours)
+                {
+                    v.GetDomain().GetValues().Add(oldValue);
+                }
+            }
+
+            assignment.Assign(variable, value);
+            return inferenceStrategy.Infer(csp, variable, value, null, false);
+
         }
     }
 }

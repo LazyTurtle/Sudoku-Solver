@@ -9,19 +9,19 @@ namespace SudokuSolver.CSP_Solver.Strategies
 {
     public class AC3<Tval> : InferenceStrategy<Tval>
     {
-        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp)
+        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, bool stopAtInconsistency = true)
         {
             Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>(csp.GetArcs());
-            return ReduceDomains(csp, queueOfArcs);
+            return ReduceDomains(csp, queueOfArcs, null, stopAtInconsistency);
         }
 
-        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value, InferenceResults<Tval> inference = null)
+        public override InferenceResults<Tval> Infer(ConstraintSatisfactionProblem<Tval> csp, Variable<Tval> variable, Tval value, InferenceResults<Tval> inference = null, bool stopAtInconsistency = true)
         {
             Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs = new Queue<Tuple<Variable<Tval>, Variable<Tval>>>((variable != null) ? csp.GetArcsTowards(variable) : csp.GetArcs());
-            return ReduceDomains(csp, queueOfArcs, inference);
+            return ReduceDomains(csp, queueOfArcs, inference, stopAtInconsistency);
         }
 
-        private InferenceResults<Tval> ReduceDomains(ConstraintSatisfactionProblem<Tval> csp, Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs, InferenceResults<Tval> inference = null)
+        private InferenceResults<Tval> ReduceDomains(ConstraintSatisfactionProblem<Tval> csp, Queue<Tuple<Variable<Tval>, Variable<Tval>>> queueOfArcs, InferenceResults<Tval> inference = null, bool stopAtInconsistency = true)
         {
             inference = inference ?? new InferenceResults<Tval>();
             while (queueOfArcs.Count > 0)
@@ -33,8 +33,9 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 {
                     if (X.GetDomain().Size() == 0)
                     {
-                        inference.InconsistencyFound();
-                        return inference;
+                        inference.InconsistencyFound(X);
+                        if(stopAtInconsistency)
+                            return inference;
                     }
                     foreach (Variable<Tval> neighbour in csp.GetNeighboursOf(X))
                     {

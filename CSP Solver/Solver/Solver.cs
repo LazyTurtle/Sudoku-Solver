@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SudokuSolver.CSP_Solver.Strategies;
 
 namespace SudokuSolver.CSP_Solver.Solver
 {
@@ -24,7 +25,7 @@ namespace SudokuSolver.CSP_Solver.Solver
         public event SolutionSearchCompleateEventHandler SolutionSearchCompleate;
         public event AssignmentCheckEventHandler AssignmentCheckCompleate;
         public abstract Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null);
-        public abstract void CheckAssignment(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initial_assignment);
+        public abstract InferenceResults<Tval> UpdateVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Tval value);
 
         protected virtual void OnSolutionFound(Assignment<Tval> solution)
         {
@@ -38,6 +39,7 @@ namespace SudokuSolver.CSP_Solver.Solver
         {
             SolutionSearchCompleateEventArgs<Tval> args = new SolutionSearchCompleateEventArgs<Tval>();
             args.SolutionFound = false;
+            args.Solution = null;
             SolutionSearchCompleate(this, args);
         }
 
@@ -52,7 +54,6 @@ namespace SudokuSolver.CSP_Solver.Solver
         public virtual void ClearEvents()
         {
             SolutionSearchCompleate = null;
-            AssignmentCheckCompleate = null;
         }
 
     }

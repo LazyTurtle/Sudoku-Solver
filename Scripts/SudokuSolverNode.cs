@@ -70,14 +70,14 @@ public class SudokuSolverNode : Node
 
     private void OnCellValueChanged(int value, int row, int column)
     {
-		Task.Factory.StartNew(() => { TaskOnCellValueChanged(value, row, column); });
+		//Task.Factory.StartNew(() => { TaskOnCellValueChanged(value, row, column); });
 	}
 
 	private void TaskOnCellValueChanged(int value, int row, int column)
     {
 		Variable<int> variable = csp.GetVariables().ElementAt(9 * row + column);
 		initial_assignment.Assign(variable, value);
-		Solver.CheckAssignment(csp, initial_assignment);
+		
 	}
 
 
@@ -178,7 +178,6 @@ public class SudokuSolverNode : Node
 		if (solveButton != null)
 			solveButton.CallDeferred("set_disabled", true);
 
-		Solver.ClearEvents();
 		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 		foreach (Godot.Collections.Array row in grid)
 		{
@@ -208,6 +207,7 @@ public class SudokuSolverNode : Node
 	private void StartSolvingSudoku(ConstraintSatisfactionProblem<int> csp, Assignment<int> initial_assignment)
 	{
 		DisableUserInput();
+		Solver.ClearEvents();
 		Solver.SolutionSearchCompleate += SearchCompleteEventHandler;
 		((BacktrackSolver<int>)Solver).VariableAssigned += OnVariableAssignedEventHandler;
 		((BacktrackSolver<int>)Solver).AssignmentRemoved += OnAssignmentRemoved;
