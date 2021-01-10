@@ -59,10 +59,11 @@ namespace SudokuSolver.CSP_Solver.Strategies
             foreach (Tval valueX in domain_values)
             {
                 assignment.Assign(variableX, valueX);
-                bool satisfiable = false;
+                bool satisfiable = true;
 
                 foreach (Tval valueY in variableY.GetDomain().GetValues())
                 {
+                    satisfiable = false;
                     assignment.Assign(variableY, valueY);
                     if (assignment.IsConsistent(csp.GetConstraints()))
                     {

@@ -26,6 +26,7 @@ namespace SudokuSolver.CSP_Solver.Solver
         public event AssignmentCheckEventHandler AssignmentCheckCompleate;
         public abstract Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null);
         public abstract InferenceResults<Tval> UpdateVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Tval value);
+        public abstract InferenceResults<Tval> RemoveVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Domain<Tval> default_domain = null);
 
         protected virtual void OnSolutionFound(Assignment<Tval> solution)
         {

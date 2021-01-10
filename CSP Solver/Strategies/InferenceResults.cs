@@ -65,5 +65,22 @@ namespace SudokuSolver.CSP_Solver.Strategies
         {
             return variablesWithEmptyDomain;
         }
+
+        public void Add(InferenceResults<Tval> inferenceToAdd)
+        {
+            isConsistent = isConsistent && inferenceToAdd.isConsistent;
+            foreach(var item in inferenceToAdd.storedDomains)
+            {
+                if(storedDomains.TryGetValue(item.Key,out var domain))
+                {
+                    domain.GetValues().UnionWith(item.Value.GetValues());
+                }
+                else
+                {
+                    storedDomains.Add(item.Key, item.Value);
+                }
+            }
+            variablesWithEmptyDomain.AddRange(inferenceToAdd.variablesWithEmptyDomain);
+        }
     }
 }
