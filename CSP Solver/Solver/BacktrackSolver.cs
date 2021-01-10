@@ -163,6 +163,8 @@ namespace SudokuSolver.CSP_Solver.Solver
                 variable.UpdateDomain(default_domain ?? new Domain<Tval>());
             }
             return inferenceStrategy.Infer(csp, false);
+            // there are difficult edge cases that an inference limited
+            // on the neighbours can't solve
             // return inferenceStrategy.Infer(csp, variable, default(Tval), null, false);
         }
     }

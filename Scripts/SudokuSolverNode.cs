@@ -75,16 +75,12 @@ public class SudokuSolverNode : Node
 
 	private void TaskOnCellValueChanged(int value, int row, int column)
     {
-		GD.Print("Updating cell at row " + row + " and column " + column + " with value " + value);
 		// the variables are inserted in the list in order, so this should
 		// work as long as the way to insert them doesn't change
 		Variable<int> variable = csp.GetVariables().ElementAt(9 * row + column);
 		var result = (value != 0) ?
 			Solver.UpdateVariable(csp, initial_assignment, variable, value) :
 			Solver.RemoveVariable(csp, initial_assignment, variable, new Domain<int>(1, 2, 3, 4, 5, 6, 7, 8, 9));
-		GD.Print("is consistent: " + result.IsAssignmentConsistent());
-		foreach (var v in csp.GetVariables())
-			GD.Print(v.ToString());
 	}
 
 
