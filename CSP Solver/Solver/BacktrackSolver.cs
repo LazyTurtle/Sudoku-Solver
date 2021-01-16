@@ -36,14 +36,14 @@ namespace SudokuSolver.CSP_Solver.Solver
             domainValueSelectionStragety = dvss ?? new UnorderedDomainValues<Tval>();
         }
 
-        public override Assignment<Tval> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null)
+        public override async Task<Assignment<Tval>> Solve(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> initialAssignment = null)
         {
             initialAssignment = initialAssignment ?? new Assignment<Tval>();
-            InferenceResults<Tval> preliminaryResults = inferenceStrategy.Infer(csp);
+            InferenceResults<Tval> preliminaryResults = await inferenceStrategy.Infer(csp);
 
             if (preliminaryResults.IsAssignmentConsistent())
             {
-                Assignment<Tval> solution = Backtrack(csp, initialAssignment);
+                Assignment<Tval> solution =await Backtrack(csp, initialAssignment);
 
                 if (solution != null)
                 {
@@ -56,7 +56,7 @@ namespace SudokuSolver.CSP_Solver.Solver
             return null;
         }
 
-        private Assignment<Tval> Backtrack(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment)
+        private async Task<Assignment<Tval>> Backtrack(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment)
         {
             if (assignment.IsComplete(csp.GetVariables()))
                 return assignment;
@@ -69,13 +69,13 @@ namespace SudokuSolver.CSP_Solver.Solver
                 InferenceResults<Tval> inference = new InferenceResults<Tval>();
                 inference.StoreDomainForVariable(variable,variable.GetDomain());
                 variable.UpdateDomain(new Domain<Tval>(value));
-
-                if (assignment.IsConsistent(csp.GetConstraints()))
+                bool isConsistent = await assignment.IsConsistentParallelAsync(csp.GetConstraints());
+                if (isConsistent)
                 {
-                    inference = inferenceStrategy.Infer(csp, variable, value, inference);
+                    inference = await inferenceStrategy.Infer(csp, variable, value, inference);
                     if (inference.IsAssignmentConsistent())
                     {
-                        Assignment<Tval> result = Backtrack(csp, assignment);
+                        Assignment<Tval> result = await Backtrack(csp, assignment);
                         if (result != null)
                             return result;
                     }
@@ -123,7 +123,7 @@ namespace SudokuSolver.CSP_Solver.Solver
         // (the assignment was not consistent) there is going to be another
         // inference to rule out inconsistent domains.
 
-        public override InferenceResults<Tval> UpdateVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Tval value)
+        public override async Task<InferenceResults<Tval>> UpdateVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Tval value)
         {
             if (csp == null)
                 throw new ArgumentNullException("csp");
@@ -132,14 +132,14 @@ namespace SudokuSolver.CSP_Solver.Solver
             if (variable == null)
                 throw new ArgumentNullException("variable");
 
-            InferenceResults<Tval> removeInference = RemoveVariable(csp, assignment, variable);
+            InferenceResults<Tval> removeInference = await RemoveVariable(csp, assignment, variable);
             
             assignment.Assign(variable, value);
             variable.UpdateDomain(new Domain<Tval>(value));
-            return inferenceStrategy.Infer(csp, variable, value, removeInference, false);
+            return await inferenceStrategy.Infer(csp, variable, value, removeInference, false);
         }
 
-        public override InferenceResults<Tval> RemoveVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Domain<Tval> default_domain = null)
+        public override async Task<InferenceResults<Tval>> RemoveVariable(ConstraintSatisfactionProblem<Tval> csp, Assignment<Tval> assignment, Variable<Tval> variable, Domain<Tval> default_domain = null)
         {
             if (csp == null)
                 throw new ArgumentNullException("csp");
@@ -162,7 +162,7 @@ namespace SudokuSolver.CSP_Solver.Solver
                 }
                 variable.UpdateDomain(default_domain ?? new Domain<Tval>());
             }
-            return inferenceStrategy.Infer(csp, false);
+            return await inferenceStrategy.Infer(csp, false);
             // there are difficult edge cases that an inference limited
             // on the neighbours can't solve
             // return inferenceStrategy.Infer(csp, variable, default(Tval), null, false);

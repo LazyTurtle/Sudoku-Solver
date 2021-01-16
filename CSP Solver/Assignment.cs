@@ -25,10 +25,12 @@ namespace SudokuSolver.CSP_Solver
         {
             return variables.Count() == assignments.Keys.Count;
         }
-
         public bool IsConsistent(IEnumerable<Constraint<Tval>> constraints)
         {
-            //return !constraints.Any(c => c.IsViolated(this));
+            return !constraints.Any(c => c.IsViolated(this));
+        }
+        public async Task<bool> IsConsistentParallelAsync(IEnumerable<Constraint<Tval>> constraints)
+        {
             int constraintsPerTask = (int)Math.Ceiling((constraints.Count() / (float)numberOfTasks));
             List<Task<bool>> tasks = new List<Task<bool>>(numberOfTasks);
             List<Constraint<Tval>> constraintList = constraints.ToList();
@@ -46,10 +48,8 @@ namespace SudokuSolver.CSP_Solver
                     return ConsistencyInRange(constraintList, local * constraintsPerTask, (local + 1) * constraintsPerTask);
                 }));
             }
-            Task<bool[]> tasksResult = Task.WhenAll(tasks);
-            tasksResult.Wait();
-            return !tasksResult.Result.Any(r => r == false);
-            
+            bool[] tasksResult = await Task.WhenAll(tasks);
+            return !tasksResult.Any(r => r == false);
         }
 
         private bool ConsistencyInRange(List<Constraint<Tval>> constraints, int min, int max)
