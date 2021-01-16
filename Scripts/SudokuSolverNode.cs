@@ -70,7 +70,7 @@ public class SudokuSolverNode : Node
 
     private void OnCellValueChanged(int value, int row, int column)
     {
-		Task.Factory.StartNew(() => { TaskOnCellValueChanged(value, row, column); });
+		Task.Run(() => { TaskOnCellValueChanged(value, row, column); });
 	}
 
 	private void TaskOnCellValueChanged(int value, int row, int column)
@@ -235,6 +235,8 @@ public class SudokuSolverNode : Node
 
 	private Variable<int>[,] CreateVariablesInt(Godot.Collections.Array grid)
 	{
+		// if this method changes, TaskOnCellValueChanged must also be changed as well
+
 		Variable<int>[,] variables = new Variable<int>[9, 9];
 		for (int i = 0; i < 9; ++i)
 		{
