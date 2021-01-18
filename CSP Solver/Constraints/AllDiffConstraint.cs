@@ -13,6 +13,9 @@ namespace SudokuSolver.CSP_Solver.Constraints
 
         AllDiffConstraint(IEnumerable<Variable<Tval>> variables)
         {
+            if (variables == null)
+                throw new ArgumentNullException("variables");
+
             scope = ImmutableArray.Create(variables.ToArray());
             valueTable = new Dictionary<Tval, int>(scope.Length);
         }
@@ -24,17 +27,24 @@ namespace SudokuSolver.CSP_Solver.Constraints
 
         public override bool IsViolated(Assignment<Tval> assignment)
         {
-            foreach (var key in valueTable.Keys)
-            {
-                valueTable[key] = 0;
-            }
+            valueTable.Clear();
 
             foreach (var variable in scope)
             {
                 if (assignment.HasBeenAssigned(variable))
                 {
                     Tval Tvalue = assignment.ValueOf(variable);
-                    valueTable[Tvalue] = valueTable[Tvalue] + 1;
+
+                    if (valueTable.TryGetValue(Tvalue, out int count))
+                    {
+                        valueTable[Tvalue] = valueTable[Tvalue] + 1;
+                    }
+                    else
+                    {
+                        valueTable.Add(Tvalue, 1);
+                    }
+                    
+                    
                 }
             }
 
