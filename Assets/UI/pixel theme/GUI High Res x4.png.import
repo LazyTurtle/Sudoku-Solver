@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/GUI High Res.png-9af3129ebaf87a15252935ea308f0db3.stex"
+path="res://.import/GUI High Res x4.png-ba81fcc0cc83288948bc3b8272bb8d41.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/UI/pixel theme/GUI High Res.png"
-dest_files=[ "res://.import/GUI High Res.png-9af3129ebaf87a15252935ea308f0db3.stex" ]
+source_file="res://Assets/UI/pixel theme/GUI High Res x4.png"
+dest_files=[ "res://.import/GUI High Res x4.png-ba81fcc0cc83288948bc3b8272bb8d41.stex" ]
 
 [params]
 

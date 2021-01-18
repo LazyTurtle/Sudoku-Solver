@@ -10,10 +10,12 @@ namespace SudokuSolver.CSP_Solver.Strategies
     {
         private bool isConsistent = true;
         private Dictionary<Variable<Tval>, Domain<Tval>> storedDomains;
+        private List<Variable<Tval>> variablesWithEmptyDomain;
 
         public InferenceResults()
         {
             storedDomains = new Dictionary<Variable<Tval>, Domain<Tval>>();
+            variablesWithEmptyDomain = new List<Variable<Tval>>();
         }
 
         public void StoreDomainForVariable(Variable<Tval> variable, Domain<Tval> domain)
@@ -43,10 +45,42 @@ namespace SudokuSolver.CSP_Solver.Strategies
             isConsistent = false;
         }
 
+        public void InconsistencyFound(Variable<Tval> variable)
+        {
+            InconsistencyFound();
+            AddInconsistentVariable(variable);
+        }
+
         public bool IsAssignmentConsistent()
         {
             return isConsistent;
         }
 
+        public void AddInconsistentVariable(Variable<Tval> variable)
+        {
+            variablesWithEmptyDomain.Add(variable);
+        }
+
+        public IEnumerable<Variable<Tval>> InconsistentVariables()
+        {
+            return variablesWithEmptyDomain;
+        }
+
+        public void Add(InferenceResults<Tval> inferenceToAdd)
+        {
+            isConsistent = isConsistent && inferenceToAdd.isConsistent;
+            foreach(var item in inferenceToAdd.storedDomains)
+            {
+                if(storedDomains.TryGetValue(item.Key,out var domain))
+                {
+                    domain.GetValues().UnionWith(item.Value.GetValues());
+                }
+                else
+                {
+                    storedDomains.Add(item.Key, item.Value);
+                }
+            }
+            variablesWithEmptyDomain.AddRange(inferenceToAdd.variablesWithEmptyDomain);
+        }
     }
 }

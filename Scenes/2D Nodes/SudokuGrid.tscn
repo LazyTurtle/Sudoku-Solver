@@ -3,8 +3,8 @@
 [ext_resource path="res://Scripts/SudokuGrid.gd" type="Script" id=1]
 
 [node name="background" type="PanelContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
+margin_right = -1906.0
+margin_bottom = -1066.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -12,8 +12,8 @@ __meta__ = {
 [node name="SudokuGrid" type="GridContainer" parent="."]
 margin_left = 7.0
 margin_top = 7.0
-margin_right = 533.0
-margin_bottom = 953.0
+margin_right = 7.0
+margin_bottom = 7.0
 size_flags_horizontal = 7
 size_flags_vertical = 7
 custom_constants/vseparation = 10
