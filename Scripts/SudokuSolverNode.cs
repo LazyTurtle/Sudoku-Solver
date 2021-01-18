@@ -49,8 +49,9 @@ public class SudokuSolverNode : Node
 		initial_assignment = CreateAssignment(variables);
 		GD.Print("assignment created");
 
-		List<Constraint<int>> constraints = CreateConstraints(variables);
-		GD.Print("constraints created");
+		List<Constraint<int>> binaryConstraints = CreateBinaryConstraints(variables);
+		GD.Print("binary constraints created");
+		List<Constraint<int>> allDiffConstraints = CreateAllDiffConstraints(variables);
 
 		relationVariablesSudoku = CreateMappingVariablesNodes(variables);
 		GD.Print("mapping created");
@@ -65,7 +66,8 @@ public class SudokuSolverNode : Node
 			}
 		}
 
-		csp = new ConstraintSatisfactionProblem<int>(variable_list, constraints);
+		csp = new ConstraintSatisfactionProblem<int>(variable_list, binaryConstraints);
+		csp.loadAllDiffConstraints(allDiffConstraints);
     }
 
     private void OnCellValueChanged(int value, int row, int column)
@@ -88,8 +90,8 @@ public class SudokuSolverNode : Node
 	{
 		Godot.Collections.Array grid = (Godot.Collections.Array)sudokuGrid.Call("export_grid");
 
-		/*
-		List<int>test= new List<int>(new int[] {
+		
+		List<int> test= new List<int>(new int[] {
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -100,9 +102,9 @@ public class SudokuSolverNode : Node
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
 		});
-		*/
+		
 		/*
-		List<int>test= new List<int>(new int[] {
+		List<int> test= new List<int>(new int[] {
 		1, 2, 3, 4, 5, 6, 7, 8, 9,
 		4, 5, 6, 7, 8, 9, 1, 2, 3,
 		7, 8, 9, 1, 2, 3, 4, 5, 6,
@@ -115,7 +117,7 @@ public class SudokuSolverNode : Node
 		});
 		*/
 		/*
-		List<int>test= new List<int>(new int[] {
+		List<int> test= new List<int>(new int[] {
 		1, 2, 0, 0, 5, 6, 0, 8, 9,
 		4, 5, 0, 7, 0, 9, 1, 0, 3,
 		7, 8, 0, 1, 2, 3, 0, 0, 6,
@@ -127,8 +129,8 @@ public class SudokuSolverNode : Node
 		0, 1, 2, 3, 4, 5, 6, 7, 8,
 		});
 		*/
-		
-		List<int>test= new List<int>(new int[] {
+		/*
+		List<int> test= new List<int>(new int[] {
 		8, 2, 0, 0, 1, 0, 0, 0, 3,
 		0, 0, 0, 0, 0, 4, 7, 0, 5,
 		0, 9, 0, 0, 0, 0, 0, 0, 0,
@@ -139,9 +141,9 @@ public class SudokuSolverNode : Node
 		2, 0, 1, 4, 0, 0, 0, 0, 0,
 		6, 0, 0, 0, 2, 0, 0, 5, 9,
 		});
-		
+		*/
 		/*
-		List<int>test= new List<int>(new int[] {
+		List<int> test= new List<int>(new int[] {
 		0, 2, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 6, 0, 0, 0, 0, 3,
 		0, 7, 4, 0, 8, 0, 0, 0, 0,
@@ -151,6 +153,19 @@ public class SudokuSolverNode : Node
 		0, 0, 0, 0, 1, 0, 7, 8, 0,
 		5, 0, 0, 0, 0, 9, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 4, 0,
+		});
+		*/
+		/*
+		List<int> test = new List<int>(new int[] {
+		0, 0, 0, 0, 0, 1, 0, 4, 0,
+		0, 0, 0, 0, 0, 9, 0, 0, 6,
+		4, 7, 0, 0, 0, 0, 8, 0, 0,
+		0, 0, 0, 1, 0, 0, 4, 7, 0,
+		7, 0, 0, 5, 9, 8, 0, 0, 0,
+		0, 1, 0, 7, 0, 0, 0, 3, 0,
+		0, 0, 0, 0, 0, 3, 0, 0, 0,
+		0, 0, 2, 0, 0, 0, 0, 0, 0,
+		5, 0, 8, 4, 0, 0, 9, 0, 0,
 		});
 		*/
 
@@ -280,9 +295,9 @@ public class SudokuSolverNode : Node
 		return assignment;
 	}
 
-	private List<Constraint<Tval>> CreateConstraints<Tval>(Variable<Tval>[,] v)
+	private List<Constraint<Tval>> CreateAllDiffConstraints<Tval>(Variable<Tval>[,] v)
 	{
-		List<Constraint<Tval>> constraints = new List<Constraint<Tval>>();
+		List<Constraint<Tval>> AllDiffConstraints = new List<Constraint<Tval>>();
 		// set all constraint for the rows
 		for (int i = 0; i < 9; i++)
 		{
@@ -291,7 +306,7 @@ public class SudokuSolverNode : Node
 			{
 				row.Add(v[i, j]);
 			}
-			constraints.AddRange(AllDiff(row));
+			AllDiffConstraints.Add(new AllDiffConstraint<Tval>(row));
 		}
 		// set all constraint for the columns
 
@@ -302,20 +317,55 @@ public class SudokuSolverNode : Node
 			{
 				column.Add(v[j, i]);
 			}
-			constraints.AddRange(AllDiff(column));
+			AllDiffConstraints.Add(new AllDiffConstraint<Tval>(column));
 		}
 		// set all constraint for the sub-squares
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 3; j++)
 			{
-				constraints.AddRange(AllDiff(VariablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
+				AllDiffConstraints.Add(new AllDiffConstraint<Tval>(VariablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
 			}
 		}
-		return constraints;
+		return AllDiffConstraints;
 	}
 
-	private IEnumerable<Constraint<Tval>> AllDiff<Tval>(List<Variable<Tval>> variables)
+	private List<Constraint<Tval>> CreateBinaryConstraints<Tval>(Variable<Tval>[,] v)
+	{
+		List<Constraint<Tval>> binaryConstraints = new List<Constraint<Tval>>();
+		// set all constraint for the rows
+		for (int i = 0; i < 9; i++)
+		{
+			List<Variable<Tval>> row = new List<Variable<Tval>>(9);
+			for (int j = 0; j < 9; j++)
+			{
+				row.Add(v[i, j]);
+			}
+			binaryConstraints.AddRange(BinaryAllDiff(row));
+		}
+		// set all constraint for the columns
+
+		for (int i = 0; i < 9; i++)
+		{
+			List<Variable<Tval>> column = new List<Variable<Tval>>(9);
+			for (int j = 0; j < 9; j++)
+			{
+				column.Add(v[j, i]);
+			}
+			binaryConstraints.AddRange(BinaryAllDiff(column));
+		}
+		// set all constraint for the sub-squares
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				binaryConstraints.AddRange(BinaryAllDiff(VariablesOfBoxStartingAt(v, (i % 3) * 3, j * 3)));
+			}
+		}
+		return binaryConstraints;
+	}
+
+	private IEnumerable<Constraint<Tval>> BinaryAllDiff<Tval>(List<Variable<Tval>> variables)
 	{
 		List<Constraint<Tval>> binaryConstraints = new List<Constraint<Tval>>(36);
 		for (int i = 0; i < variables.Count; i++)

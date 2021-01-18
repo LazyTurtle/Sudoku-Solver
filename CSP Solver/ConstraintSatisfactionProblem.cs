@@ -12,6 +12,7 @@ namespace SudokuSolver.CSP_Solver
     {
         private ImmutableArray<Variable<Tval>> Variables;
         private ImmutableArray<Constraint<Tval>> Constraints;
+        private ImmutableArray<Constraint<Tval>> AllDiffConstraints;
         private ImmutableDictionary<Variable<Tval>, List<Variable<Tval>>> NeighboursTable;
         private List<Tuple<Variable<Tval>, Variable<Tval>>> arcs;
         private ImmutableDictionary<Variable<Tval>,List<Tuple<Variable<Tval>,Variable<Tval>>>> VariableArcsTable;
@@ -50,6 +51,11 @@ namespace SudokuSolver.CSP_Solver
             return table;
         }
 
+        internal void loadAllDiffConstraints(List<Constraint<Tval>> allDiffConstraints)
+        {
+            AllDiffConstraints = ImmutableArray.Create(allDiffConstraints.ToArray());
+        }
+
         // This is only used for binary constraints
         private Dictionary<Variable<Tval>, List<Variable<Tval>>> CreateNeighboursArcs(ImmutableArray<Constraint<Tval>> constraints)
         {
@@ -86,6 +92,11 @@ namespace SudokuSolver.CSP_Solver
         public IEnumerable<Variable<Tval>> GetVariables()
         {
             return Variables;
+        }
+
+        public IEnumerable<Constraint<Tval>> GetAllDiffConstraints()
+        {
+            return AllDiffConstraints;
         }
 
         public IEnumerable<Constraint<Tval>> GetConstraints()
