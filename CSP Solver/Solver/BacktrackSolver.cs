@@ -66,11 +66,17 @@ namespace SudokuSolver.CSP_Solver.Solver
             {
                 assignment.Assign(variable, value);
                 OnVariableAssigned(variable, value);
+
                 InferenceResults<Tval> inference = new InferenceResults<Tval>();
                 inference.StoreDomainForVariable(variable,variable.GetDomain());
                 variable.UpdateDomain(new Domain<Tval>(value));
-                bool isConsistent = await assignment.IsConsistentParallelAsync(csp.GetConstraints());
-                if (isConsistent)
+
+                // it should already be consistent if it reached this point
+                // since we make a pre-solving inference
+
+                //bool isConsistent = assignment.IsConsistent(csp.GetAllDiffConstraints());
+                //if (isConsistent)
+                if (true)
                 {
                     inference = await inferenceStrategy.Infer(csp, variable, value, inference);
                     if (inference.IsAssignmentConsistent())

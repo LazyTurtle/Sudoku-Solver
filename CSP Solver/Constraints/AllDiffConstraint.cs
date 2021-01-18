@@ -9,15 +9,15 @@ namespace SudokuSolver.CSP_Solver.Constraints
 {
     class AllDiffConstraint<Tval> : Constraint<Tval>
     {
-        Dictionary<Tval, int> valueTable;
+        Dictionary<Tval, int> valuesCountTable;
 
-        AllDiffConstraint(IEnumerable<Variable<Tval>> variables)
+        public AllDiffConstraint(IEnumerable<Variable<Tval>> variables)
         {
             if (variables == null)
                 throw new ArgumentNullException("variables");
 
             scope = ImmutableArray.Create(variables.ToArray());
-            valueTable = new Dictionary<Tval, int>(scope.Length);
+            valuesCountTable = new Dictionary<Tval, int>(scope.Length);
         }
 
         public override bool IsSatisfied(Assignment<Tval> assignment)
@@ -27,7 +27,7 @@ namespace SudokuSolver.CSP_Solver.Constraints
 
         public override bool IsViolated(Assignment<Tval> assignment)
         {
-            valueTable.Clear();
+            valuesCountTable.Clear();
 
             foreach (var variable in scope)
             {
@@ -35,20 +35,20 @@ namespace SudokuSolver.CSP_Solver.Constraints
                 {
                     Tval Tvalue = assignment.ValueOf(variable);
 
-                    if (valueTable.TryGetValue(Tvalue, out int count))
+                    if (valuesCountTable.TryGetValue(Tvalue, out int count))
                     {
-                        valueTable[Tvalue] = valueTable[Tvalue] + 1;
+                        valuesCountTable[Tvalue] = count + 1;
                     }
                     else
                     {
-                        valueTable.Add(Tvalue, 1);
+                        valuesCountTable.Add(Tvalue, 1);
                     }
                     
                     
                 }
             }
 
-            return valueTable.Any(p => p.Value > 1);
+            return valuesCountTable.Any(p => p.Value > 1);
         }
     }
 }

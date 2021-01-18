@@ -65,7 +65,7 @@ namespace SudokuSolver.CSP_Solver.Strategies
                 {
                     satisfiable = false;
                     assignment.Assign(variableY, valueY);
-                    bool isConsistent = await assignment.IsConsistentParallelAsync(csp.GetConstraints());
+                    bool isConsistent = assignment.IsConsistent(csp.GetAllDiffConstraints());
                     if (isConsistent)
                     {
                         satisfiable = true;

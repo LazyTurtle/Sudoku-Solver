@@ -29,6 +29,8 @@ namespace SudokuSolver.CSP_Solver
         {
             return !constraints.Any(c => c.IsViolated(this));
         }
+
+        // there is no more need for this parallelized consistency check
         public async Task<bool> IsConsistentParallelAsync(IEnumerable<Constraint<Tval>> constraints)
         {
             int constraintsPerTask = (int)Math.Ceiling((constraints.Count() / (float)numberOfTasks));
